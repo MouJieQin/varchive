@@ -143,6 +143,8 @@ class ResourceMapManager:
         if not metaFilename:
             return
         metaPath = self.getMetaPathByMetaFilename(metaFilename)
+        if not os.path.exists(metaPath):
+            return
         detailsPath = self.getDetailsPath(metaPath)
         details = {}
         with open(detailsPath, mode="r", encoding="utf-8") as f:
