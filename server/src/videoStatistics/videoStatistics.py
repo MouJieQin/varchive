@@ -74,7 +74,7 @@ class VideoStatistics:
                 )
 
     def __insertClip(self, clipStartTime: int, clipEndTime: int, clipCount: int = 1):
-        print("[{},{}]".format(clipStartTime, clipEndTime))
+        # print("[{},{}]".format(clipStartTime, clipEndTime))
         if clipEndTime - clipStartTime < self.minClip:
             return
         startTimePreIndex = 0

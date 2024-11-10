@@ -167,7 +167,6 @@ class BookmarkManager:
                 self.webpsDir = self.ResourceMap.getWebpsPath(self.varchiveDir)
                 self.detailsPath = self.ResourceMap.getDetailsPath(self.varchiveDir)
                 self.bookmarkPath = self.ResourceMap.getBookmarkPath(self.varchiveDir)
-                print("#############bookmarkPath:", self.bookmarkPath)
                 if os.path.exists(self.bookmarkPath):
                     if self.bookmarkPath in BookmarksUsing.keys():
                         self.bookmarkJson = BookmarksUsing[self.bookmarkPath]
@@ -212,7 +211,7 @@ class BookmarkManager:
         return webpFilename + ".png"
 
     def _getWebpPath(self, outputDir: str, startTime: float, endTime: float) -> str:
-        return outputDir + "/" + str(startTime) + "-" + str(endTime) + ".webp"
+        return outputDir + "/" + str(startTime) + "-" + str(endTime) + videoEditing.VideoEditing.webpFormat
 
     def _createWebpDirIfNotExist(self):
         if not os.path.exists(self.webpsDir):

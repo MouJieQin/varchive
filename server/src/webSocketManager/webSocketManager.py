@@ -18,6 +18,8 @@ import videoStatistics.videoStatistics as videoStatistics
 
 class WebSocketManager:
     sendTextLock = asyncio.Lock()
+    broadcastToIinasLock = asyncio.Lock()
+    broadcastToVarchivesLock = asyncio.Lock()
 
     def __init__(self, Config, maxConnection, ResourceMap, SystemRunner):
         self.ResourceMap = ResourceMap
@@ -89,22 +91,30 @@ class WebSocketManager:
         await websocket.send_text(text)
 
     async def broadcastToIinasByMetaPath(self, metaPath: str, text: str):
-        if metaPath not in self.metaFilenameMapIinaID.keys():
-            return
-        for id in self.metaFilenameMapIinaID[metaPath]:
-            if self.isIinaConnected(id):
-                await self.sendTextNoWait(self.activeIinaConnections[id], text)
-        # avoid sending too many message simultaneously, which could damage websocket
-        await asyncio.sleep(0.01)
+        try:
+            async with WebSocketManager.broadcastToIinasLock:
+                if metaPath not in self.metaFilenameMapIinaID.keys():
+                    return
+                for id in self.metaFilenameMapIinaID[metaPath]:
+                    if self.isIinaConnected(id):
+                        await self.sendTextNoWait(self.activeIinaConnections[id], text)
+                # avoid sending too many message simultaneously, which could damage websocket
+                await asyncio.sleep(0.01)
+        except Exception as e:
+            print(f"An error occurred when broadcast to iinas: {e}")
 
     async def broadcastToVarchivesByMetaPath(self, metaPath: str, text: str):
-        if metaPath not in self.metaFilenameMapVarchiveID.keys():
-            return
-        for id in self.metaFilenameMapVarchiveID[metaPath]:
-            if self.isVarchiveConnected(id):
-                await self.sendTextNoWait(self.activeVarchiveConnections[id], text)
-        # avoid sending too many message simultaneously, which could damage websocket
-        await asyncio.sleep(0.01)
+        try:
+            async with WebSocketManager.broadcastToVarchivesLock:
+                if metaPath not in self.metaFilenameMapVarchiveID.keys():
+                    return
+                for id in self.metaFilenameMapVarchiveID[metaPath]:
+                    if self.isVarchiveConnected(id):
+                        await self.sendTextNoWait(self.activeVarchiveConnections[id], text)
+                # avoid sending too many message simultaneously, which could damage websocket
+                await asyncio.sleep(0.01)
+        except Exception as e:
+            print(f"An error occurred when broadcast to varchives: {e}")
 
     async def broadcastToIinasByIinaID(self, ID: int, text: str):
         metaPath = self.iinaIDmapMetaPath[ID]

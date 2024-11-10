@@ -14,6 +14,8 @@ PQueue = ProcessQueue(maxSize=1)
 
 
 class VideoEditing:
+    # .webp .gif
+    webpFormat=".webp" 
     def __init__(self, videoPath: str, isNetworkResource: bool):
         self.videoPath: str = videoPath
         self.isNetworkResource: bool = isNetworkResource
@@ -85,7 +87,7 @@ class VideoEditing:
             return self.networkResourceExt
 
     def getWebpPath(self, outputDir: str, startTime: float, endTime: float) -> str:
-        return outputDir + "/" + str(startTime) + "-" + str(endTime) + ".webp"
+        return outputDir + "/" + str(startTime) + "-" + str(endTime) + self.webpFormat
 
     def getPngFilePath(self, webpFilename: str):
         return webpFilename + ".png"
