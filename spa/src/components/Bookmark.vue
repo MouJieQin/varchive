@@ -77,15 +77,21 @@ export default {
 
     watch: {
         bookmarkPattern(newPattern, old) {
+            this.watchChange()
+        },
+        bookmark(newBookmark, old) {
+            this.watchChange()
+        },
+    },
+
+    methods: {
+        watchChange() {
             const titleResult = this.highlightTextWithMatch(this.bookmark.title, this.bookmarkPattern)
             this.highlightedTitle = titleResult.highlightedText
             const descriptionResult = this.highlightTextWithMatch(this.bookmark.description, this.bookmarkPattern)
             this.highlightedDescription = descriptionResult.highlightedText
             this.isMatch = titleResult.hasMatch || descriptionResult.hasMatch
         },
-    },
-
-    methods: {
         handleEditBookmark(index, bookmarkForEditing) {
             this.editBookmark(index, bookmarkForEditing)
             this.isEditingBookmark = false
