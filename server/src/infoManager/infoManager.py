@@ -98,7 +98,7 @@ class IINAinfoManager(IINAbookmarkManager):
             "endTime": endTime,
         }
         cover = self.infoJson["cover"]
-        coverPath = self.webpsDir + "/0.webp"
+        coverPath = self.webpsDir + "/0" + videoEditing.VideoEditing.webpFormat
         videoEditor.genWebp(
             startTime,
             endTime,
@@ -318,7 +318,9 @@ class VarchiveInfoManager(VarchiveBookmarkManager):
         self._createWebpDirIfNotExist()
         timestamps = [percentage * videoDuration for percentage in percentages]
         previewWebpOutputPaths = []
-        previewWebpCoverPath = self.webpsDir + "/0.webp"
+        previewWebpCoverPath = (
+            self.webpsDir + "/0" + videoEditing.VideoEditing.webpFormat
+        )
         cover = self.infoJson["cover"]
         for timestamp in timestamps:
             startTime = timestamp
