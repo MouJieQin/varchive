@@ -261,7 +261,7 @@ if __name__ == "__main__":
         app="varchive-server:app",
         host=HOST,
         port=PORT,
-        reload=True,
+        reload=False,
         ssl_keyfile=SSL_KEY_FILE,
         ssl_certfile=SSL_CERT_FILE,
     )

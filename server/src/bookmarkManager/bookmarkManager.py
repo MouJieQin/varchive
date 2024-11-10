@@ -624,9 +624,9 @@ class VarchiveBookmarkManager(BookmarkManager):
 
         # notify iina
         message = {
-            "currentURL": self.message["currentURL"],
-            "timestamp": self.message["timestamp"],
-            "index": self.message["index"],
+            "currentURL": currentURL,
+            "timestamp": timestamp,
+            "index": index,
             "title": self.message["title"],
             "description": self.message["description"],
         }
