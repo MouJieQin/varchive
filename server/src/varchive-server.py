@@ -94,7 +94,6 @@ async def websocketID(request: Request, path: str = ""):
 
 @app.websocket("/ws/iina/{clientID}")
 async def websocketEndpointIINA(websocket: WebSocket, clientID: int):
-    print(clientID)
     await WebsocketManager.connectIina(clientID, websocket)
     WebsocketManager.messagesFromIina[clientID].clear()
     try:
@@ -115,7 +114,6 @@ async def websocketEndpointIINA(websocket: WebSocket, clientID: int):
 
 @app.websocket("/ws/varchive/video/details/{clientID}")
 async def websocketEndpointVarchive(websocket: WebSocket, clientID: int):
-    print(clientID)
     await WebsocketManager.connectVarchive(clientID, websocket)
     WebsocketManager.messagesFromVarchiveVideo[clientID].clear()
     try:
@@ -145,9 +143,7 @@ class ListFiles(BaseModel):
 
 @app.get("/filemanager", response_model=ListFiles)
 async def videoListDir(request: Request, path: str = ""):
-    print(path)
     res = FileManager.listDir(path)
-    print(res)
     return ListFiles(fileStatusCode=res[0], fileList=res[1])
 
 
@@ -218,7 +214,6 @@ class FetchJson(BaseModel):
 
 @app.get("/filemanager/json", response_model=FetchJson)
 async def fetchJson(request: Request, path: str = ""):
-    print(path)
     path = FILE_MANAGER_ABS_PATH + path
     if not os.path.isfile(path):
         raise HTTPException(status_code=400, detail="Not a file or does not exist")
@@ -231,7 +226,6 @@ async def fetchJson(request: Request, path: str = ""):
 @app.get("/filemanager/open", response_model=FetchJson)
 async def openFileOnFinder(request: Request, path: str = ""):
     path = FILE_MANAGER_ABS_PATH + "/" + path
-    print(path)
     if not os.path.exists(path):
         raise HTTPException(status_code=400, detail="Not a file or does not exist")
     command = ["open", path]
@@ -247,7 +241,6 @@ class SubTitleParsed(BaseModel):
 
 @app.get("/subtitle/parser", response_model=SubTitleParsed)
 async def parseSubtitle(request: Request, path: str = ""):
-    print(path)
     try:
         resParsed = subtitle.subtitile.Subtitle(path).readAndParse()
         return SubTitleParsed(subParseCode=0, subParsedJsonStr=json.dumps(resParsed))
