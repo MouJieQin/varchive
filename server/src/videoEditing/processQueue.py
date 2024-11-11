@@ -180,11 +180,9 @@ class ProcessQueue:
                             *task.val[TaskInfo.ARGS],
                             **task.val[TaskInfo.KWARGS]
                         )
-                    print("size:", self.tasks.size())
                     self.keyMapTask.pop(task.val[TaskInfo.KEY])
                     task = self.tasks.removeAndReturnNext(task)
-                    print("size:", self.tasks.size())
-                    print("task:", task)
+                    print("task size:", self.tasks.size())
                 elif process.poll() == None:
                     runningCount += 1
                     task = task.next
