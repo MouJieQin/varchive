@@ -215,6 +215,11 @@ class ResourceMapManager:
             return False
         return True
 
+    def isValidMetaPath(self, path: str) -> bool:
+        return os.path.realpath(
+            os.path.dirname(path)
+        ) == self.metaPath and os.path.exists(self.getDetailsPath(path))
+
     @staticmethod
     def isVarchiveLinkDir(path: str) -> bool:
         return os.path.isfile(path + "/link-varchive.json")
@@ -322,10 +327,8 @@ class ResourceMapManager:
     def getWebpsPath(self, metaPath: str):
         return metaPath + "/webps"
 
-    def isVarchiveVideo(self, path: str) -> bool:
-        return os.path.isfile(self.getDetailsPath(path)) or self.isVarchiveVideoLink(
-            path
-        )
+    def isValidVarchiveVideo(self, path: str) -> bool:
+        return self.isValidMetaPath(path) or self.isValidVarchiveVideoLink(path)
 
     def getMetaFilenameByLink(self, linkDir: str) -> str:
         if not self.isVarchiveVideoLink(linkDir):

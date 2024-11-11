@@ -14,11 +14,10 @@ class FileManager:
         if not os.path.isdir(path):
             res["type"] = "file"
         else:
-            if self.ResourceMap.isVarchiveVideo(path):
-                if self.ResourceMap.isValidVarchiveVideoLink(path):
-                    res["type"] = "varchive-video"
-                else:
-                    res["type"] = "invalid-varchive-video"
+            if self.ResourceMap.isValidVarchiveVideo(path):
+                res["type"] = "varchive-video"
+            elif self.ResourceMap.isVarchiveVideoLink(path):
+                res["type"] = "invalid-varchive-video"
             else:
                 res["type"] = "directory"
         return res
@@ -29,7 +28,9 @@ class FileManager:
             return (-1, [])
         if not os.path.isdir(realPath):
             return (1, [])
-        if os.path.isdir(realPath) and self.ResourceMap.isValidVarchiveVideoLink(realPath):
+        if os.path.isdir(realPath) and self.ResourceMap.isValidVarchiveVideo(
+            realPath
+        ):
             return (0, [])
         res = []
         files = sorted(os.listdir(realPath))
