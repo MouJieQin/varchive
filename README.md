@@ -12,16 +12,16 @@ Clone this [repository](https://github.com/MouJieQin/varchive.git) by running
 
 > Varchive relys on an video player, **[iina-for-varchive](https://github.com/MouJieQin/iina-for-varchive)** forked from the project  [iina](https://github.com/iina/iina)
 
-Download the corresponding version of [realease](https://github.com/MouJieQin/iina-for-varchive/releases). 
+Download the corresponding version of [release](https://github.com/MouJieQin/iina-for-varchive/releases). 
 
-> Install it but do not open it.  Ensure that inna-for-varchive opens after the varchive server is launched.
+> Install it but do not open it.  Ensure that iina-for-varchive opens after the varchive server is launched.
 
 #### Varchive Server
 
 1. Install root certificate
 > [!Important]
 >
-> You can generate and install your own root certificate, which can be more safe. 
+> You can generate and install your own root certificate, which can be safer. 
 > You will have to replace the `server/pem/server.crt` and `server/pem/server.key`
 > with ones generated from your root certificate if you do so.
 > These two files are used to provide https serve demanded by IINA and Varchive.
@@ -41,13 +41,13 @@ Double click it and select  `「Always Trust」` for `「Secure Sockets Layer(SS
 
 
 
-2. Install command line tools used to generate images from video and download video from network resources by running 
+1. Install command line tools used to generate images from video and download video from network resources by running 
 
    ```shell
    brew install ffmpeg yt-dlp
    ```
 
-3. Launch server
+2. Launch server
 
    > The server is developed by python3.9, so python3.9+ shoulde work too.
    >
@@ -84,7 +84,7 @@ npm run dev
 
 ### A simple start
 
-Open a video using [iina-for-varchive](https://github.com/MouJieQin/iina-for-varchive), press `i` key first then press `o` key. A varchive page of this video will be opened on your browser. (Note: you have to use iina defautl key bindings config to do it, or you have to config your key bindings first. )
+Open a video using [iina-for-varchive](https://github.com/MouJieQin/iina-for-varchive), press `a` key first then press `o` key. A varchive page of this video will be opened on your browser. (Note: you have to use iina defautl key bindings config to do it, or you have to config your key bindings first. )
 
 ![directory-navigation](assets/directory.mov.gif)
 
