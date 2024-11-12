@@ -196,7 +196,8 @@ class VideoEditing:
         outputPath: str,
         compression_level: int = 5,
         quality: int = 80,
-        scale: str = "320:180",
+        scale: str = "320:-1",
+        # scale: str = "320:180",
         fps: int = 8,
         loop: int = 0,
     ) -> str:
