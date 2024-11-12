@@ -16,9 +16,6 @@
                     </template>
                 </el-popconfirm>
 
-                <!-- <el-icon v-show="!isEditingBookmark" class="icon" style="margin-left: 15px; float:left">
-                    <Delete @click="removeBookmark(index, bookmark.timestamp)" />
-                </el-icon> -->
                 <el-icon v-show="!isEditingBookmark" class="icon" style="margin-left: 15px; float:left">
                     <Edit @click="isEditingBookmark = true" />
                 </el-icon>
@@ -36,20 +33,18 @@
             <el-input v-else v-model="bookmarkForEditing.title" clearable style="margin-bottom: 10px;max-width: 600px">
                 <template #prepend>Title</template>
             </el-input>
-            <!-- <h3 style="text-align: center; ">{{ bookmark.title }}</h3> -->
-            <p v-if="!isEditingBookmark" v-html="highlightedDescription"></p>
+            <p class="editing" v-if="!isEditingBookmark" v-html="highlightedDescription"></p>
             <el-input v-else v-model="bookmarkForEditing.description" autosize type="textarea"
                 style="margin-bottom: 10px;" />
-            <!-- <p>Suspendisse lobortis pharetra tempor. Cras eleifend ante sed arcu interdum, in bibendum enim ultricies. Integer rutrum quis risus at tempor. Maecenas facilisis, nisi vel pellentesque maximus, lectus felis malesuada purus, a pulvinar elit est quis turpis. Duis convallis purus quis finibus consequat. Pellentesque faucibus tincidunt augue non consequat. Donec fringilla at est sit amet blandit. Nunc at porttitor ligula. Fusce sed odio turpis. Suspendisse lobortis pharetra tempor. Cras eleifend ante sed arcu interdum, in bibendum enim ultricies. Integer rutrum quis risus at tempor. Maecenas facilisis, nisi vel pellentesque maximus, lectus felis malesuada purus, a pulvinar elit est quis turpis. Duis convallis purus quis finibus consequat. Pellentesque faucibus tincidunt augue non consequat. Donec fringilla at est sit amet blandit. Nunc at porttitor ligula. Fusce sed odio turpis.</p> -->
-
         </div>
     </div>
 </template>
 
 <script>
 import WebpPreview from '@/components/WebpPreview.vue'
-import { CopyDocument, Check, Close, Edit, Refresh, Delete } from '@element-plus/icons-vue'
-import { ElMessage, ElNotification, ElMessageBox } from 'element-plus';
+import { CopyDocument, Check, Close, Edit, Delete } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import MarkdownIt from 'markdown-it'
 
 export default {
     data() {
@@ -59,6 +54,7 @@ export default {
             isMouseOver: false,
             isMatch: true,
             highlightedTitle: this.bookmark.title,
+            markdownParser: new MarkdownIt(),
             highlightedDescription: this.bookmark.description,
         }
     },
@@ -86,11 +82,18 @@ export default {
 
     methods: {
         watchChange() {
-            const titleResult = this.highlightTextWithMatch(this.bookmark.title, this.bookmarkPattern)
-            this.highlightedTitle = titleResult.highlightedText
-            const descriptionResult = this.highlightTextWithMatch(this.bookmark.description, this.bookmarkPattern)
-            this.highlightedDescription = descriptionResult.highlightedText
-            this.isMatch = titleResult.hasMatch || descriptionResult.hasMatch
+            if (this.bookmarkPattern === "") {
+                this.isMatch = true
+                this.highlightedTitle = this.bookmark.title
+                this.highlightedDescription = this.markdownParser.render(this.bookmark.description)
+            } else {
+                const titleResult = this.highlightTextWithMatch(this.bookmark.title, this.bookmarkPattern)
+                this.highlightedTitle = titleResult.highlightedText
+                const descriptionResult = this.highlightTextWithMatch(this.bookmark.description, this.bookmarkPattern)
+                this.highlightedDescription = descriptionResult.highlightedText
+                this.isMatch = titleResult.hasMatch || descriptionResult.hasMatch
+            }
+
         },
         handleEditBookmark(index, bookmarkForEditing) {
             this.editBookmark(index, bookmarkForEditing)
@@ -111,6 +114,9 @@ export default {
                     ElMessage.error('Something went wrong', err)
                 })
         },
+    },
+    mounted() {
+        this.watchChange()
     }
 }
 </script>

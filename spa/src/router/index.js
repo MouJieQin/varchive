@@ -1,10 +1,9 @@
-import Home from '@/views/Home.vue'
 import {createRouter, createWebHistory} from 'vue-router'
 
 
 const routes =
     [
-      {path: '/', name: 'Home', component: Home}, {
+      {
         path: '/video/:path+',
         name: 'videop',
         component: () => import('@/views/Video.vue'),
@@ -15,6 +14,11 @@ const routes =
         name: 'video',
         component: () => import('@/views/Video.vue'),
         // props: route => ({...route.params}),
+      },
+      {
+        path: '/help',
+        name: 'help',
+        component: () => import('@/views/Help.vue')
       },
       {
         path: '/:pathMatch(.*)*',

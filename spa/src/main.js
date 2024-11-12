@@ -8,7 +8,4 @@ import ElementPlus from 'element-plus'
 import {createApp} from 'vue'
 
 const app = createApp(App)
-app.config.globalProperties.$WebSocketIDCounter = {
-  value: 0,
-};
 app.use(router).use(ElementPlus).mount('#app')
