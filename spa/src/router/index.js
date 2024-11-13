@@ -15,11 +15,11 @@ const routes =
         component: () => import('@/views/Video.vue'),
         // props: route => ({...route.params}),
       },
-      {
-        path: '/help',
-        name: 'help',
-        component: () => import('@/views/Help.vue')
-      },
+      // {
+      //   path: '/help',
+      //   name: 'help',
+      //   component: () => import('@/views/Help.vue')
+      // },
       {
         path: '/:pathMatch(.*)*',
         name: 'NotFound',

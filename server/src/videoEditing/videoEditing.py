@@ -96,49 +96,6 @@ class VideoEditing:
         path = path.replace('"', '\\"')
         return '"' + path + '"'
 
-    def __genPreviewByTimestamps(
-        self,
-        outputDir: str,
-        duration: float,
-        timestamps: Tuple[float],
-        callback: callable,
-        *args,
-        **kwargs
-    ) -> Tuple[str]:
-        webpOutputPaths: List[str] = []
-        print(timestamps)
-        for timestamp in timestamps:
-            startTime = timestamp
-            endTime = startTime + duration
-            outputPath = self.getWebpPath(outputDir, startTime, endTime)
-            res = self.genWebp(
-                startTime, endTime, outputPath, callback, *args, **kwargs
-            )
-            webpOutputPaths.append(outputPath)
-        return webpOutputPaths
-
-    def genPreviewByPercentages(
-        self,
-        outputDir: str,
-        duration: float,
-        percentages: Tuple[float],
-        callback: callable,
-        *args,
-        **kwargs
-    ):
-        if (
-            len(percentages) == 0
-            or percentages[-1] * self.getVideoDuration() + duration
-            > self.getVideoDuration()
-        ):
-            return -1
-        timestamps = [
-            percentage * self.getVideoDuration() for percentage in percentages
-        ]
-        self.__genPreviewByTimestamps(
-            outputDir, duration, timestamps, callback, *args, **kwargs
-        )
-
     def concatWebps(self, outputPath: str, *webpFiles: str) -> Tuple[str, str]:
         frames = []
         print(webpFiles)
