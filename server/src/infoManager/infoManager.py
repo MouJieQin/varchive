@@ -72,6 +72,15 @@ class IINAinfoManager(IINAbookmarkManager):
         videoEditor = videoEditing.VideoEditing(
             self.urlForEditing, self.isNetworkResource
         )
+        if self.isNetworkResource:
+            # Send notification to varchive due to a long time when acquiring network video resource duration.
+            message = self.genNotificationMessageForVarchive(
+                "notification",
+                "notification",
+                "Acquiring network video resource duration, please wait.",
+                self.url,
+            )
+            await self.sendText(message)
         videoDuration = videoEditor.getVideoDuration()
         if videoDuration <= 0:
             message = self.genNotificationMessageForVarchive(
@@ -289,11 +298,18 @@ class VarchiveInfoManager(VarchiveBookmarkManager):
         await self.__syncEditedInformation()
 
     async def __genPreview(self) -> int:
+        if self.isNetworkResource:
+            # Send notification to varchive due to a long time when acquiring network video resource duration.
+            message = self.genNotificationMessageForVarchive(
+                "notification",
+                "notification",
+                "Acquiring network video resource duration, please wait.",
+                self.url,
+            )
+            await self.sendText(message)
         videoEditor = videoEditing.VideoEditing(
             self.urlForEditing, self.isNetworkResource
         )
-        # percentages = [i / 100 for i in range(5, 100, 20)]
-        percentages = [i / 100 for i in range(5, 100, 10)]
         videoDuration = videoEditor.getVideoDuration()
         if videoDuration <= 0:
             message = self.genNotificationMessageForVarchive(
@@ -301,6 +317,8 @@ class VarchiveInfoManager(VarchiveBookmarkManager):
             )
             await self.sendText(message)
             return -1
+        # percentages = [i / 100 for i in range(5, 100, 20)]
+        percentages = [i / 100 for i in range(5, 100, 10)]
         if percentages[-1] * videoDuration + self.duration > videoDuration:
             message = self.genNotificationMessageForVarchive(
                 "notification",
