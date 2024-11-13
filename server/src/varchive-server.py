@@ -87,7 +87,7 @@ class WebsockeID(BaseModel):
 
 
 @app.get("/websocket/id", response_model=WebsockeID)
-async def websocketID(request: Request, path: str = ""):
+async def websocketID(request: Request):
     ID = await WebsocketManager.getIDAvailableForVarchive()
     return WebsockeID(id=ID)
 
