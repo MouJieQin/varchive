@@ -10,12 +10,15 @@ import videoEditing.videoEditing as videoEditing
 import webSocketManager.messageQueue as messageQueue
 from resourceMap.resourceMap import ResourceMapManager
 from videoEditing.processQueue import *
+from threadAsync.threadAsync import ThreadAsync
 
 #  Store used bookmark.json to avoid overwriting bookmark.json while multiple running async bookmark operations (eg. insert) are performing
 BookmarksUsing = {}
 
 
 class BookmarkManager:
+    threadAsync = ThreadAsync()
+
     def __init__(
         self,
         type: List[str],
@@ -211,7 +214,14 @@ class BookmarkManager:
         return webpFilename + ".png"
 
     def _getWebpPath(self, outputDir: str, startTime: float, endTime: float) -> str:
-        return outputDir + "/" + str(startTime) + "-" + str(endTime) + videoEditing.VideoEditing.webpFormat
+        return (
+            outputDir
+            + "/"
+            + str(startTime)
+            + "-"
+            + str(endTime)
+            + videoEditing.VideoEditing.webpFormat
+        )
 
     def _createWebpDirIfNotExist(self):
         if not os.path.exists(self.webpsDir):
