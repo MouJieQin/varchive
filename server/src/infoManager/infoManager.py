@@ -115,12 +115,7 @@ class IINAinfoManager(IINAbookmarkManager):
         )
 
     def __handleGenCover(self):
-        def run_async_task():
-            asyncio.run(self.__genCover())
-
-        genCoverThread = threading.Thread(target=run_async_task)
-        genCoverThread.daemon = True
-        genCoverThread.start()
+        self.threadAsync.addAsyncFunction(self.__genCover)
 
     async def __handleInfoWithoutPreview(self):
         await self.__initDetails()
@@ -352,12 +347,7 @@ class VarchiveInfoManager(VarchiveBookmarkManager):
             )
 
     def __handleGenPreview(self):
-        def run_async_task():
-            asyncio.run(self.__genPreview())
-
-        genPreviewThread = threading.Thread(target=run_async_task)
-        genPreviewThread.daemon = True
-        genPreviewThread.start()
+        self.threadAsync.addAsyncFunction(self.__genPreview)
 
     async def __handleClearPreview(self):
         clips = self.infoJson["previews"]["clips"]
