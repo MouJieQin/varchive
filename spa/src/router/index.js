@@ -4,6 +4,11 @@ import {createRouter, createWebHistory} from 'vue-router'
 const routes =
     [
       {
+        path: '/',
+        name: 'home',
+        component: () => import('@/views/Video.vue'),
+      },
+      {
         path: '/video/:path+',
         name: 'videop',
         component: () => import('@/views/Video.vue'),

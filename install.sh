@@ -1,6 +1,9 @@
 #!/bin/bash
 
-VARCHIVE_PATH=$(dirname "$0")
+VARCHIVE_PATH=$(
+    cd $(dirname "$0")
+    pwd
+)
 cd "$VARCHIVE_PATH"
 
 checkExist() {
@@ -29,18 +32,24 @@ main() {
     cd -
 
     if ! checkExist 'brew'; then
-        if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"; then
+        if ! /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"; then
             echo "Error: Cannot install brew" 1>&2
             exit 1
         fi
     fi
-    installIfNotExist "python3"
+    if ! checkExist 'python3.9'; then
+        if ! brew install python@3.9; then
+            echo "Error: Cannot install python@3.9" 1>&2
+            exit 1
+        fi
+    fi
+
     installIfNotExist "npm"
     installIfNotExist "ffmpeg"
     installIfNotExist "yt-dlp"
 
     cd server/src
-    if ! python3 -m pip install -r requirements.txt; then
+    if ! python3.9 -m pip install -r requirements.txt; then
         echo "Error: Pythone cannot install all lib in the requirements.txt" 1>&2
         exit 1
     fi
@@ -53,6 +62,22 @@ main() {
     fi
     cd -
 
+    if ! osascript -e 'tell application "System Events" to get the name of every login item' | grep varchive-start.sh; then
+        # Ask the user for input
+        read -p "Do you want to add the varchive-start.sh to your 「Login items」? ([yes]/no):" response
+        # Check the user's response
+        if [ -z "$response" ] || [[ "$response" == "yes" || "$response" == "YES" ]]; then
+            osascript -e "tell application \"System Events\" to make new login item at end with properties {path:\"$VARCHIVE_PATH/shell/varchive-start.sh\", hidden:false}"
+        elif [[ "$response" == "no" || "$response" == "NO" ]]; then
+            echo
+        else
+            echo
+        fi
+    fi
+
+    echo
+    echo
+    echo
     echo "Install successfully!"
     echo "To start varchive by running:"
     echo "$VARCHIVE_PATH/shell/varchive-start.sh"
