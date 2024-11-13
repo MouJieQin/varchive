@@ -12,6 +12,7 @@ class ThreadAsync:
         self.async_functions = []
         # Start the asyncio event loop in a separate thread
         thread = threading.Thread(target=self.__start_async_loop)
+        thread.daemon = True
         thread.start()
 
     # Start the asyncio event loop in a separate thread
