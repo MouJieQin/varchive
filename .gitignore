@@ -27,6 +27,8 @@ dist-ssr
 **/__pycache__/**
 server/fileManager/
 server/src/resourceMap/resourceMap.json
+server/pem/rootCA.*
+server/pem/server.*
 
 # JS
 spa/public/images/
