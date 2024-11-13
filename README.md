@@ -8,6 +8,19 @@ Clone this [repository](https://github.com/MouJieQin/varchive.git) by running
    ```shell
    git clone https://github.com/MouJieQin/varchive.git
    ````
+### Install through shell script
+
+```shell
+cd varchive
+./install.sh
+```
+
+
+
+> You will be asked to type your system password during the process.
+>
+> The `install.sh` should be able to install varchive automatically, or you may have to refer to the following steps.
+
 #### IINA for Varchive
 
 > Varchive relys on an video player, **[iina-for-varchive](https://github.com/MouJieQin/iina-for-varchive)** forked from the project  [iina](https://github.com/iina/iina)
