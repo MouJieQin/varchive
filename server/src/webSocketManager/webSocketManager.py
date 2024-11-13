@@ -17,10 +17,6 @@ import videoStatistics.videoStatistics as videoStatistics
 
 
 class WebSocketManager:
-    sendTextLock = asyncio.Lock()
-    broadcastToIinasLock = asyncio.Lock()
-    broadcastToVarchivesLock = asyncio.Lock()
-
     def __init__(self, Config, maxConnection, ResourceMap, SystemRunner):
         self.ResourceMap = ResourceMap
         self.Config = Config
@@ -39,6 +35,14 @@ class WebSocketManager:
 
         self.activeVarchiveConnections: list[WebSocket] = [
             None for i in range(0, self.maxConnection)
+        ]
+
+        self.sendTextToIinaLocks: List[asyncio.Lock] = [
+            asyncio.Lock() for i in range(0, self.maxConnection)
+        ]
+
+        self.sendTextToVarchiveLocks: List[asyncio.Lock] = [
+            asyncio.Lock() for i in range(0, self.maxConnection)
         ]
 
         self.messagesFromIina: list[MessageQueue] = [
@@ -74,45 +78,39 @@ class WebSocketManager:
         manageVIconnectionThread.daemon = True
         manageVIconnectionThread.start()
 
-    @staticmethod
-    async def sendText(websocket: WebSocket, text: str):
+    async def sendTextToIina(self, ID: int, text: str):
         try:
             # Acquire the lock before sending the message
-            async with WebSocketManager.sendTextLock:
-                await websocket.send_text(text)
-                # Introduce a small delay to avoid overloading the websocket
-                await asyncio.sleep(0.01)
+            async with self.sendTextToIinaLocks[ID]:
+                if self.isIinaConnected(ID):
+                    await self.activeIinaConnections[ID].send_text(text)
         except Exception as e:
-            # Handle any exceptions that might occur
-            print(f"An error occurred: {e}")
+            print(f"An error occurred while sending text to IINA[{ID}]: {e}")
 
-    @staticmethod
-    async def sendTextNoWait(websocket: WebSocket, text: str):
-        await websocket.send_text(text)
+    async def sendTextToVarchive(self, ID: int, text: str):
+        try:
+            # Acquire the lock before sending the message
+            async with self.sendTextToVarchiveLocks[ID]:
+                if self.isVarchiveConnected(ID):
+                    await self.activeVarchiveConnections[ID].send_text(text)
+        except Exception as e:
+            print(f"An error occurred while sending text to Varchive[{ID}]: {e}")
 
     async def broadcastToIinasByMetaPath(self, metaPath: str, text: str):
         try:
-            async with WebSocketManager.broadcastToIinasLock:
-                if metaPath not in self.metaFilenameMapIinaID.keys():
-                    return
-                for id in self.metaFilenameMapIinaID[metaPath]:
-                    if self.isIinaConnected(id):
-                        await self.sendTextNoWait(self.activeIinaConnections[id], text)
-                # avoid sending too many message simultaneously, which could damage websocket
-                await asyncio.sleep(0.01)
+            if metaPath not in self.metaFilenameMapIinaID.keys():
+                return
+            for id in self.metaFilenameMapIinaID[metaPath]:
+                await self.sendTextToIina(id, text)
         except Exception as e:
             print(f"An error occurred when broadcast to iinas: {e}")
 
     async def broadcastToVarchivesByMetaPath(self, metaPath: str, text: str):
         try:
-            async with WebSocketManager.broadcastToVarchivesLock:
-                if metaPath not in self.metaFilenameMapVarchiveID.keys():
-                    return
-                for id in self.metaFilenameMapVarchiveID[metaPath]:
-                    if self.isVarchiveConnected(id):
-                        await self.sendTextNoWait(self.activeVarchiveConnections[id], text)
-                # avoid sending too many message simultaneously, which could damage websocket
-                await asyncio.sleep(0.01)
+            if metaPath not in self.metaFilenameMapVarchiveID.keys():
+                return
+            for id in self.metaFilenameMapVarchiveID[metaPath]:
+                await self.sendTextToVarchive(id, text)
         except Exception as e:
             print(f"An error occurred when broadcast to varchives: {e}")
 
@@ -263,19 +261,17 @@ class WebSocketManager:
         )
 
     def isIinaConnected(self, ID: int):
-        return self.activeIinaConnections[ID] != None
+        return self.activeIinaConnections[ID] is not None
 
     def isVarchiveConnected(self, ID: int):
-        return self.activeVarchiveConnections[ID] != None
+        return self.activeVarchiveConnections[ID] is not None
 
     async def sendPairedInfo(self, iinaID: int, varchiveVideoID: int):
         info = {
             "type": ["varchive", "connection", "paired"],
             "message": "",
         }
-        await self.activeVarchiveConnections[varchiveVideoID].send_text(
-            json.dumps(info)
-        )
+        await self.sendTextToVarchive(varchiveVideoID, json.dumps(info))
 
     async def sendDispairedInfoToVarchiveByIinaID(self, iinaID: int):
         info = {
@@ -285,9 +281,7 @@ class WebSocketManager:
         varchiveVideoID = self.idMapFromIinaToVarchiveVideo[iinaID]
         if varchiveVideoID == -1 or not self.activeVarchiveConnections[varchiveVideoID]:
             return
-        await self.activeVarchiveConnections[varchiveVideoID].send_text(
-            json.dumps(info)
-        )
+        await self.sendTextToVarchive(varchiveVideoID, json.dumps(info))
 
     async def setIDMap(self, iinaID: int, varchiveVideoID: int):
         self.idMapFromIinaToVarchiveVideo[iinaID] = varchiveVideoID
@@ -375,7 +369,7 @@ class WebSocketManager:
                 informationManager = infoManager.IINAinfoManager(
                     messageJson["type"],
                     messageJson["message"],
-                    lambda text: self.sendText(websocket, text),
+                    lambda text: self.sendTextToIina(ID, text),
                     lambda text: self.broadcastToIinasByMetaPath(metaPath, text),
                     lambda text: self.broadcastToVarchivesByMetaPath(metaPath, text),
                     messages,
@@ -396,7 +390,7 @@ class WebSocketManager:
             secondType = messageJson["type"][1]
             if secondType == "seek":
                 if self.idMapFromVarchiveVideoToIina[ID] == -1:
-                    self.openInIina(messageJson["type"][2], websocket)
+                    self.openInIina(ID, messageJson["type"][2])
             messages.put(text)
         elif firstType == "server":
             secondType = messageJson["type"][1]
@@ -412,7 +406,7 @@ class WebSocketManager:
                 else:
                     self.metaFilenameMapVarchiveID[metaPath].add(ID)
             elif secondType == "openInIINA":
-                self.openInIina(messageJson["message"], websocket)
+                self.openInIina(ID, messageJson["message"])
             else:
                 message = json.loads(messageJson["message"])
                 varchiveCurrentPath = message["varchiveCurrentPath"]
@@ -422,7 +416,7 @@ class WebSocketManager:
                 informationManager = infoManager.VarchiveInfoManager(
                     messageJson["type"],
                     messageJson["message"],
-                    lambda text: self.sendText(websocket, text),
+                    lambda text: self.sendTextToVarchive(ID, text),
                     lambda text: self.broadcastToIinasByMetaPath(metaPath, text),
                     lambda text: self.broadcastToVarchivesByMetaPath(metaPath, text),
                     messages,
@@ -457,7 +451,7 @@ class WebSocketManager:
             if not messages.empty():
                 message = messages.get()
                 try:
-                    await websocket.send_text(message)
+                    await self.sendTextToIina(iinaID, message)
                 except Exception as e:
                     print(
                         "This exception may be normal because the connection to IINA is closed.{}".format(
@@ -479,7 +473,7 @@ class WebSocketManager:
             if not messages.empty():
                 message = messages.get()
                 try:
-                    await websocket.send_text(message)
+                    await self.sendTextToVarchive(varchiveVideoID, message)
                 except Exception as e:
                     print(
                         "This exception may be normal because the connection to varchive is closed.{}".format(
@@ -490,22 +484,22 @@ class WebSocketManager:
             else:
                 await self.sleep()
 
-    async def __callbackForOpenInIina(self, res, websocket: WebSocket):
+    async def __callbackForOpenInIina(self, res, ID: int):
         if res.returncode == 0:
             message = infoManager.VarchiveInfoManager.genNotificationMessageForVarchive(
                 "message", "success", "Opened in iina.", ""
             )
-            await websocket.send_text(message)
+            await self.sendTextToVarchive(ID, message)
         else:
             print(res.stderr)
             message = infoManager.VarchiveInfoManager.genNotificationMessageForVarchive(
                 "notification", "error", "Error while opening it in iina.", res.stderr
             )
-            await websocket.send_text(message)
+            await self.sendTextToVarchive(ID, message)
 
-    def openInIina(self, url: str, websocket: WebSocket) -> str:
+    def openInIina(self, ID: int, url: str) -> str:
         iinaPath = self.Config["iina"]["path"]
         command = ["open", url, "-a", iinaPath]
         print(command)
-        self.SystemRunner.put(command, self.__callbackForOpenInIina, websocket)
+        self.SystemRunner.put(command, self.__callbackForOpenInIina, ID)
         return ""
