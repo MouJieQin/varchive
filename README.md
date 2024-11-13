@@ -18,36 +18,26 @@ Download the corresponding version of [release](https://github.com/MouJieQin/iin
 
 #### Varchive Server
 
-1. Install root certificate
-> [!Important]
->
-> You can generate and install your own root certificate, which can be safer. 
-> You will have to replace the `server/pem/server.crt` and `server/pem/server.key`
-> with ones generated from your root certificate if you do so.
-> These two files are used to provide https serve demanded by IINA and Varchive.
+1. Install root certificate by running 
 
+   > [!Important]
+   >
+   > The genCA.sh will generate your own root certificate to provide https serve demanded by IINA and Varchive.
+   >
+   > You will be asked to type your system password during the process.
 
-Open the root certificate by running
-```shell
-open varchive/server/pem
-```
-Double click on the file `rootCA.pem`, which will open the KeyChain Access App.
+   ```shell
+   cd varchive/server/pem
+   ./genCA.sh
+   ```
 
-Search `Varchive` in the App if you don't see `Varchive Root CA`.
-
-Double click it and select  `「Always Trust」` for `「Secure Sockets Layer(SSL)」` and `「X.509 Basic Policy」`.
-
-<p align="center"><img src="assets/trust_certificate.png" alt="trust_certificate" width=500 /></p>
-
-
-
-1. Install command line tools used to generate images from video and download video from network resources by running 
+2. Install command line tools used to generate images from video and download video from network resources by running 
 
    ```shell
    brew install ffmpeg yt-dlp
    ```
 
-2. Launch server
+3. Launch server
 
    > The server is developed by python3.9, so python3.9+ shoulde work too.
    >
@@ -55,8 +45,8 @@ Double click it and select  `「Always Trust」` for `「Secure Sockets Layer(SS
 
    ```shell
    cd varchive/server/src
-   python3.9 -m pip install -r requirements.txt
-   python3.9 varchive-server.py
+   python3 -m pip install -r requirements.txt
+   python3 varchive-server.py
    ```
 
 #### Varchive client
