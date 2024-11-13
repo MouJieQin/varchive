@@ -20,7 +20,7 @@ Download the corresponding version of [release](https://github.com/MouJieQin/iin
 
 1. Install root certificate by running 
 
-   > [!Important]
+   > [!important]
    >
    > The genCA.sh will generate your own root certificate to provide https serve demanded by IINA and Varchive.
    >
