@@ -29,10 +29,10 @@
   },
   "build": {
     "appId": "com.dweb.varchive",
-    "copyright": "Copyright © 2021 <qinmoujie>",
+    "copyright": "Copyright © 2024 <qinmoujie>",
     "productName": "Varchive",
     "mac": {
-      "icon": "build/icon.png",
+      "icon": "build/icon.icns",
       "category": "public.app-category.utilities",
       "artifactName": "${productName}-${version}.${ext}",
       "target": [
