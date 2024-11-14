@@ -2,11 +2,12 @@
   "name": "varchive",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "main":"main.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron:serve": "electron ."
   },
   "dependencies": {
     "echarts": "^5.5.1",
@@ -17,6 +18,33 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.4",
-    "vite": "^5.4.8"
+    "concurrently": "^9.1.0",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "vite": "^5.4.8",
+    "wait-on": "^8.0.1"
+  },
+  "build": {
+    "appId": "com.varchive.app",
+    "copyright": "Copyright ***",
+    "productName": "Varchive",
+    "files": [
+      "!dist/**/*"
+    ],
+    "mac": {
+      "icon": "build/icon.png",
+      "category": "public.varchive-category.productivity",
+      "artifactName": "${productName}_${version}.${ext}",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "createDesktopShortcut": "always",
+      "allowToChangeInstallationDirectory": true
+    },
+    "extends": null
   }
 }
