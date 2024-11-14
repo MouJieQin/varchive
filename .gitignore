@@ -35,3 +35,7 @@ spa/public/images/
 spa/public/webps/
 spa/src/data.json
 spa/src/placeholder.ts
+
+# electron
+spa/electron/
+spa/dist_electron/
