@@ -1,8 +1,15 @@
 <p align="center">
 <img src="spa/src/assets/logo.svg" alt="Varchive" height=60 />
 </p>
+## Install
 
-## Running
+### IINA for Varchive
+
+> Varchive relys on an video player, **[iina-for-varchive](https://github.com/MouJieQin/iina-for-varchive)** forked from the project  [iina](https://github.com/iina/iina)
+
+Download the corresponding version of [release](https://github.com/MouJieQin/iina-for-varchive/releases). 
+
+> Install it but do not open it.  Ensure that iina-for-varchive opens after the varchive server is launched.
 
 Clone this [repository](https://github.com/MouJieQin/varchive.git) by running 
    ```shell
@@ -21,19 +28,13 @@ cd varchive
 >
 > The `install.sh` should be able to install varchive automatically, or you may have to refer to the following steps.
 
-#### IINA for Varchive
-
-> Varchive relys on an video player, **[iina-for-varchive](https://github.com/MouJieQin/iina-for-varchive)** forked from the project  [iina](https://github.com/iina/iina)
-
-Download the corresponding version of [release](https://github.com/MouJieQin/iina-for-varchive/releases). 
-
-> Install it but do not open it.  Ensure that iina-for-varchive opens after the varchive server is launched.
+### Install step by step 
 
 #### Varchive Server
 
 1. Install root certificate by running 
 
-   > [!important]
+   > [!IMPORTANT]
    >
    > The genCA.sh will generate your own root certificate to provide https serve demanded by IINA and Varchive.
    >
