@@ -1,14 +1,20 @@
 {
   "name": "varchive",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "version": "1.0.0",
+  "author": "qinmoujie",
+  "description": "An app to archive videos",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron": "wait-on tcp:5999 && cross-env NODE_ENV=development electron .",
+    "electron:serve": "concurrently -k \"npm run dev\" \"npm run electron\"",
+    "electron:build": "vite build && electron-builder && cp -r server dist_electron/mac/Varchive.app/Contents/Resources"
   },
   "dependencies": {
+    "child_process": "^1.0.2",
     "echarts": "^5.5.1",
     "element-plus": "^2.8.5",
     "markdown-it": "^14.1.0",
@@ -17,6 +23,36 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.4",
-    "vite": "^5.4.8"
+    "concurrently": "^9.1.0",
+    "cross-env": "^7.0.3",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "vite": "^5.4.8",
+    "wait-on": "^8.0.1"
+  },
+  "build": {
+    "appId": "com.dweb.varchive",
+    "copyright": "Copyright © 2024 <qinmoujie>",
+    "productName": "Varchive",
+    "mac": {
+      "icon": "electron/build/icon.icns",
+      "category": "public.app-category.utilities",
+      "artifactName": "${productName}-${version}.${ext}",
+      "target": [
+        "dmg"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist_electron"
+    }
   }
 }
