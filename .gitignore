@@ -38,3 +38,4 @@ spa/src/placeholder.ts
 
 # electron
 spa/dist_electron/
+*.flag

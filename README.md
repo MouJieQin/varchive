@@ -1,6 +1,7 @@
 <p align="center">
 <img src="spa/src/assets/logo.svg" alt="Varchive" height=60 />
 </p>
+
 ## Install
 
 ### IINA for Varchive

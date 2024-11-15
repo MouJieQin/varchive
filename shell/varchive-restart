@@ -1,0 +1,9 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(dirname "$0")
+cd "$SCRIPT_DIR"
+./varchive-stop
+if ! ./varchive-start;then
+    exit 1
+fi
+exit 0

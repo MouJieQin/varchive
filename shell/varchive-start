@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Get the directory of the script
+SCRIPT_DIR=$(dirname "$0")
+SCRIPT_PARENT_DIR=$(
+    cd "$SCRIPT_DIR/.."
+    pwd
+)
+
+if [ ! -f $SCRIPT_PARENT_DIR/successfully_installed.flag ]; then
+    if ! open $SCRIPT_PARENT_DIR/install; then
+        echo "Install failed!" 1>&2
+        exit 1
+    fi
+fi
+
+if ! ps -ef | grep varchive-server.py | grep -v grep; then
+    cd "$SCRIPT_DIR/../server/src"
+    nohup python3.9 varchive-server.py >>/tmp/varchive-server.log 2>&1 &
+    cd - >/dev/null
+fi
+
+if ! ps -ef | grep ./varchive-client | grep -v grep; then
+    cd "$SCRIPT_DIR"
+    nohup ./varchive-client >>/tmp/varchive-client.log 2>&1 &
+    cd - >/dev/null
+    TOTAL=5
+    count=0
+    while ! curl http://localhost:5999/ >/dev/null 2>&1; do
+        let count=count+1
+        if [ $count -ge $TOTAL ]; then
+            echo "Failed: npm run dev!" 1>&2
+            exit 1
+        fi
+        sleep 1
+    done
+    cat "$SCRIPT_DIR/../spa/npm.log" | tail -n 7
+fi
+
+exit 0
