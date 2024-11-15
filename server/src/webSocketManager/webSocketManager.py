@@ -86,6 +86,7 @@ class WebSocketManager:
                     await self.activeIinaConnections[ID].send_text(text)
         except Exception as e:
             print(f"An error occurred while sending text to IINA[{ID}]: {e}")
+            self.disconnectIina(ID)
 
     async def sendTextToVarchive(self, ID: int, text: str):
         try:
@@ -95,6 +96,7 @@ class WebSocketManager:
                     await self.activeVarchiveConnections[ID].send_text(text)
         except Exception as e:
             print(f"An error occurred while sending text to Varchive[{ID}]: {e}")
+            self.disconnectVarchive(ID)
 
     async def broadcastToIinasByMetaPath(self, metaPath: str, text: str):
         try:

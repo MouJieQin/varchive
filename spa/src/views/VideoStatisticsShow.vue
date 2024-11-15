@@ -165,9 +165,12 @@ export default {
         },
     },
     async mounted() {
-        // window.addEventListener("resize", () => {
-        //     this.barChart.resize();
-        // })
+
+        window.addEventListener("resize", () => {
+            if (this.barChart !== null) {
+                this.barChart.resize();
+            }
+        })
 
         setInterval(async () => {
             await this.pageUpdateForBarChart();

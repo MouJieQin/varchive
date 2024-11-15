@@ -553,7 +553,8 @@ export default {
         },
         getMessageToServer() {
             const message = {}
-            message["currentURL"] = this.videoInfo.path[0].url
+            // this.videoInfo.path[0].url
+            message["currentURL"] = this.urlSelected
             message["varchiveCurrentPath"] = this.currentPath
             return message
         },
