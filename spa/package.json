@@ -32,7 +32,7 @@
     "copyright": "Copyright © 2024 <qinmoujie>",
     "productName": "Varchive",
     "mac": {
-      "icon": "build/icon.icns",
+      "icon": "electron/build/icon.icns",
       "category": "public.app-category.utilities",
       "artifactName": "${productName}-${version}.${ext}",
       "target": [
