@@ -101,6 +101,7 @@ class ResourceMapManager:
     def __init__(
         self,
         Config: Dict,
+        USER_HOME_PATH: str,
         SERVER_SRC_ABS_PATH: str,
         FILE_MANAGER_ABS_PATH: str,
         SystemRunner,
@@ -114,6 +115,7 @@ class ResourceMapManager:
         self.postfixOfLink = ".varchive"
         self.resourceMapPath = SERVER_SRC_ABS_PATH + "/resourceMap/resourceMap.json"
         self.relMetaPath = "meta/video"
+        self.USER_HOME_PATH = USER_HOME_PATH
         self.FILE_MANAGER_ABS_PATH = FILE_MANAGER_ABS_PATH
         self.metaPath = FILE_MANAGER_ABS_PATH + "/" + self.relMetaPath
         self.archivePath = FILE_MANAGER_ABS_PATH + "/video/Varchive"
@@ -124,6 +126,9 @@ class ResourceMapManager:
         )
         ResourceMapManager.createDirIfnotExists(self.metaPath)
         ResourceMapManager.createDirIfnotExists(self.archivePath)
+        ResourceMapManager.symLinkIfnotExists(
+            self.USER_HOME_PATH, f"{self.archivePath}/Home"
+        )
         ResourceMapManager.createDirIfnotExists(self.newPath)
         ResourceMapManager.createDirIfnotExists(self.recentPath)
         self.recentManager = RecentManager(
@@ -137,6 +142,12 @@ class ResourceMapManager:
     def createDirIfnotExists(path: str):
         if not os.path.exists(path):
             os.makedirs(path)
+
+    @staticmethod
+    def symLinkIfnotExists(src: str, dst: str):
+        if not os.path.exists(dst):
+            if os.path.exists(src):
+                os.symlink(src, dst)
 
     def pushRecentByURL(self, url: str):
         metaFilename = self.getMetaFilenameByURL(url)

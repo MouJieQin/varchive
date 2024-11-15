@@ -43,7 +43,7 @@ PORT = Config["server"]["port"]
 
 SystemRunner = systemRun.SystemRun()
 ResourceMap = resourceMap.ResourceMapManager(
-    Config, SERVER_SRC_ABS_PATH, FILE_MANAGER_ABS_PATH, SystemRunner
+    Config, USER_HOME_PATH, SERVER_SRC_ABS_PATH, FILE_MANAGER_ABS_PATH, SystemRunner
 )
 
 app = FastAPI()
