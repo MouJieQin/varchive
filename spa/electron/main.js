@@ -4,23 +4,39 @@ const { exec } = require("child_process");
 const { dialog } = require("electron");
 
 const splits = __dirname.split("/");
-const serverPath = splits.splice(0, splits.length - 2).join("/") + "/server";
+const varchivePath = splits.splice(0, splits.length - 2).join("/");
 
-const shellPath = serverPath.concat("/src/x.sh");
+const startPath = varchivePath.concat("/shell/varchive-start");
 
-// exec(shellPath, (error, stdout, stderr) => {
-//   if (error) {
-//     const options = {
-//       type: "warning",
-//       title: "Warning",
-//       message: `${__dirname},Your warning message here:${error}`,
-//       buttons: ["OK"],
-//     };
-//     dialog.showMessageBox(options);
-//     return;
-//   } else {
-//   }
-// });
+function runShellCommand(command) {
+  return new Promise((resolve, reject) => {
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        reject(error, stderr);
+      } else {
+        resolve({ stdout });
+      }
+    });
+  });
+}
+
+async function startServer() {
+  await runShellCommand(startPath)
+    .then(({ stdout }) => {
+      console.log("Output:", stdout);
+      // Continue your code here
+    })
+    .catch((error, stderr) => {
+      const options = {
+        type: "error",
+        title: "Error",
+        message: `${__dirname},${stderr}`,
+        buttons: ["OK"],
+      };
+      dialog.showMessageBox(options);
+      return;
+    });
+}
 
 const NODE_ENV = process.env.NODE_ENV;
 
@@ -44,7 +60,8 @@ function createWindow() {
   }
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  await startServer();
   createWindow();
   app.on("activate", function () {
     if (BrowserWindow.getAllWindows().length === 0) {

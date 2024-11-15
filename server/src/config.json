@@ -6,7 +6,7 @@
     },
     "iina": {
         "path": "/Applications/IINA.app",
-        "varchiveDirURL":"Library/Application Support/com.colliderli.iina/varchive",
+        "varchiveDirURL":"com.colliderli.iina/varchive",
         "varchiveConfig":"config.plist"
     },
     "varchive": {

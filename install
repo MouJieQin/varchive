@@ -6,6 +6,11 @@ VARCHIVE_PATH=$(
 )
 cd "$VARCHIVE_PATH"
 
+if [ -f successfully_installed.flag ]; then
+    echo "Successfully installed before, If you want to reinstall, just remove $VARCHIVE_PATH/successfully_installed.flag"
+    exit 0
+fi
+
 checkExist() {
     cmd="$1"
     if $cmd --help >/dev/null; then
@@ -28,7 +33,7 @@ installIfNotExist() {
 main() {
 
     cd server/pem
-    ./genCA.sh
+    ./genCA
     cd -
 
     if ! checkExist 'brew'; then
@@ -62,12 +67,12 @@ main() {
     fi
     cd -
 
-    if ! osascript -e 'tell application "System Events" to get the name of every login item' | grep varchive-start.sh; then
+    if ! osascript -e 'tell application "System Events" to get the name of every login item' | grep varchive-start; then
         # Ask the user for input
-        read -p "Do you want to add the varchive-start.sh to your 「Login items」? ([yes]/no):" response
+        read -p "Do you want to add the varchive-start to your 「Login items」? ([yes]/no):" response
         # Check the user's response
         if [ -z "$response" ] || [[ "$response" == "yes" || "$response" == "YES" ]]; then
-            osascript -e "tell application \"System Events\" to make new login item at end with properties {path:\"$VARCHIVE_PATH/shell/varchive-start.sh\", hidden:false}"
+            osascript -e "tell application \"System Events\" to make new login item at end with properties {path:\"$VARCHIVE_PATH/shell/varchive-start\", hidden:false}"
         elif [[ "$response" == "no" || "$response" == "NO" ]]; then
             echo
         else
@@ -80,7 +85,10 @@ main() {
     echo
     echo "Install successfully!"
     echo "To start varchive by running:"
-    echo "$VARCHIVE_PATH/shell/varchive-start.sh"
+    echo "$VARCHIVE_PATH/shell/varchive-start"
+
+    touch successfully_installed.flag
+    exit 0
 }
 
 main

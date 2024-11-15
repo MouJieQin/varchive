@@ -24,14 +24,16 @@ import systemRun.systemRun as systemRun
 from pathlib import Path
 from pathvalidate import is_valid_filename, sanitize_filename
 import asyncio
+import appdirs
 
 CURR_FILE_ABS_PATH = os.path.abspath(__file__)
 SERVER_SRC_ABS_PATH = os.path.dirname(CURR_FILE_ABS_PATH)
+APP_SUPPORT_PATH = app_support_path = appdirs.user_data_dir()[0:-1]
+VARCHIVE_SUPPORT_PATH = f"{APP_SUPPORT_PATH}/varchive"
 CONFIG_FILE = SERVER_SRC_ABS_PATH + "/config.json"
-FILE_MANAGER_ABS_PATH = os.path.abspath(SERVER_SRC_ABS_PATH + "/../fileManager")
+FILE_MANAGER_ABS_PATH = VARCHIVE_SUPPORT_PATH + "/fileManager"
 SSL_KEY_FILE = os.path.abspath(SERVER_SRC_ABS_PATH + "/../pem/server.key")
 SSL_CERT_FILE = os.path.abspath(SERVER_SRC_ABS_PATH + "/../pem/server.crt")
-RESOURCE_MAP_FILE = SERVER_SRC_ABS_PATH + "/resourceMap.json"
 USER_HOME_PATH = os.environ["HOME"]
 
 Config = {}
@@ -43,7 +45,12 @@ PORT = Config["server"]["port"]
 
 SystemRunner = systemRun.SystemRun()
 ResourceMap = resourceMap.ResourceMapManager(
-    Config, USER_HOME_PATH, SERVER_SRC_ABS_PATH, FILE_MANAGER_ABS_PATH, SystemRunner
+    Config,
+    VARCHIVE_SUPPORT_PATH,
+    USER_HOME_PATH,
+    SERVER_SRC_ABS_PATH,
+    FILE_MANAGER_ABS_PATH,
+    SystemRunner,
 )
 
 app = FastAPI()
@@ -65,7 +72,7 @@ WebsocketManager = webSocketManager.WebSocketManager(
 )
 
 # Write varchive config for iina
-iinaVarchiveDirURL = "{}/{}".format(USER_HOME_PATH, Config["iina"]["varchiveDirURL"])
+iinaVarchiveDirURL = "{}/{}".format(APP_SUPPORT_PATH, Config["iina"]["varchiveDirURL"])
 ResourceMap.createDirIfnotExists(iinaVarchiveDirURL)
 IinaVarchiveConfigPath = "{}/{}".format(
     iinaVarchiveDirURL, Config["iina"]["varchiveConfig"]

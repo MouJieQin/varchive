@@ -101,6 +101,7 @@ class ResourceMapManager:
     def __init__(
         self,
         Config: Dict,
+        VARCHIVE_SUPPORT_PATH: str,
         USER_HOME_PATH: str,
         SERVER_SRC_ABS_PATH: str,
         FILE_MANAGER_ABS_PATH: str,
@@ -113,11 +114,12 @@ class ResourceMapManager:
         self.infoUsing = {}
         self.localFileHeader = "file://"
         self.postfixOfLink = ".varchive"
-        self.resourceMapPath = SERVER_SRC_ABS_PATH + "/resourceMap/resourceMap.json"
         self.relMetaPath = "meta/video"
+        self.VARCHIVE_SUPPORT_PATH = VARCHIVE_SUPPORT_PATH
         self.USER_HOME_PATH = USER_HOME_PATH
         self.FILE_MANAGER_ABS_PATH = FILE_MANAGER_ABS_PATH
         self.metaPath = FILE_MANAGER_ABS_PATH + "/" + self.relMetaPath
+        self.resourceMapPath = self.metaPath + "/resourceMap.json"
         self.archivePath = FILE_MANAGER_ABS_PATH + "/video/Varchive"
         self.newPath = FILE_MANAGER_ABS_PATH + "/video/New"
         self.recentPath = FILE_MANAGER_ABS_PATH + "/video/Recent"
