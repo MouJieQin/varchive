@@ -37,5 +37,4 @@ spa/src/data.json
 spa/src/placeholder.ts
 
 # electron
-spa/electron/
 spa/dist_electron/
