@@ -34,7 +34,7 @@ CONFIG_FILE = SERVER_SRC_ABS_PATH + "/config.json"
 FILE_MANAGER_ABS_PATH = VARCHIVE_SUPPORT_PATH + "/fileManager"
 SSL_KEY_FILE = os.path.abspath(SERVER_SRC_ABS_PATH + "/../pem/server.key")
 SSL_CERT_FILE = os.path.abspath(SERVER_SRC_ABS_PATH + "/../pem/server.crt")
-USER_HOME_PATH = os.environ["HOME"]
+USER_HOME_PATH = os.path.expanduser("~")
 
 Config = {}
 

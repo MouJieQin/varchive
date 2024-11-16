@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash --login
 
 ps -ef | grep varchive-server.py | grep -v grep | awk '{print $2}' | xargs -I {} kill -15 {}
 ps -ef | grep varchive-client | grep -v grep | awk '{print $2}' | xargs -I {} kill -15 {}

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash --login
 
 # Get the directory of the script
 SCRIPT_DIR=$(dirname "$0")
@@ -34,7 +34,7 @@ if ! ps -ef | grep ./varchive-client | grep -v grep; then
         fi
         sleep 1
     done
-    cat "$SCRIPT_DIR/../spa/npm.log" | tail -n 7
+    cat "/tmp/varchive-npm.log" | tail -n 7
 fi
 
 exit 0

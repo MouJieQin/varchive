@@ -12,9 +12,9 @@ function runShellCommand(command) {
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
       if (error) {
-        reject(error, stderr);
+        reject({ error, stderr });
       } else {
-        resolve({ stdout });
+        resolve(stdout);
       }
     });
   });
@@ -22,15 +22,15 @@ function runShellCommand(command) {
 
 async function startServer() {
   await runShellCommand(startPath)
-    .then(({ stdout }) => {
+    .then((stdout) => {
       console.log("Output:", stdout);
       // Continue your code here
     })
-    .catch((error, stderr) => {
+    .catch(({ error, stderr }) => {
       const options = {
         type: "error",
         title: "Error",
-        message: `${__dirname},${stderr}`,
+        message: `${startPath},${stderr}`,
         buttons: ["OK"],
       };
       dialog.showMessageBox(options);
