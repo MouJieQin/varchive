@@ -4,7 +4,7 @@ const { exec } = require("child_process");
 const { dialog } = require("electron");
 
 const splits = __dirname.split("/");
-const varchivePath = splits.splice(0, splits.length - 2).join("/");
+const varchivePath = splits.splice(0, splits.length - 3).join("/");
 
 const checkInstallPath = varchivePath.concat("/shell/varchive-checkInstall");
 const installPath = varchivePath.concat("/install");
@@ -102,12 +102,7 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadURL(
-    NODE_ENV === "development"
-      ? "http://localhost:5999/"
-      : "http://localhost:5999/"
-    // : `file://${path.join(__dirname, "../dist/index.html")}`
-  );
+  mainWindow.loadURL("http://localhost:5999/");
   if (NODE_ENV === "development") {
     mainWindow.webContents.openDevTools();
   }
