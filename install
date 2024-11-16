@@ -6,9 +6,18 @@ VARCHIVE_PATH=$(
 )
 cd "$VARCHIVE_PATH"
 
+VARCHIVE_INSTALL_CLOSE_FLAG_PATH="/tmp/varchive_install_close.flag"
+
+rm $VARCHIVE_INSTALL_CLOSE_FLAG_PATH
+
+handleExit() {
+    echo $1 >$VARCHIVE_INSTALL_CLOSE_FLAG_PATH
+    exit $1
+}
+
 if [ -f successfully_installed.flag ]; then
     echo "Successfully installed before, If you want to reinstall, just remove $VARCHIVE_PATH/successfully_installed.flag"
-    exit 0
+    handleExit 0
 fi
 
 checkExist() {
@@ -25,27 +34,23 @@ installIfNotExist() {
         export HOMEBREW_NO_AUTO_UPDATE=false
         if ! brew install "$cmd"; then
             echo "Error: Cannot install $cmd" 1>&2
-            exit 1
+            handleExit 1
         fi
     fi
 }
 
 main() {
 
-    cd server/pem
-    ./genCA
-    cd -
-
     if ! checkExist 'brew'; then
         if ! /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"; then
             echo "Error: Cannot install brew" 1>&2
-            exit 1
+            handleExit 1
         fi
     fi
     if ! checkExist 'python3.9'; then
         if ! brew install python@3.9; then
             echo "Error: Cannot install python@3.9" 1>&2
-            exit 1
+            handleExit 1
         fi
     fi
 
@@ -56,14 +61,21 @@ main() {
     cd server/src
     if ! python3.9 -m pip install -r requirements.txt; then
         echo "Error: Pythone cannot install all lib in the requirements.txt" 1>&2
-        exit 1
+        handleExit 1
     fi
     cd -
 
     cd spa
-    if ! npm install; then
+    if ! npm install --omit=dev; then
         echo "Error: npm install failed!" 1>&2
-        exit 1
+        handleExit 1
+    fi
+    cd -
+
+    cd server/pem
+    if ! ./genCA; then
+        echo "Error: Root Certificate install failed!" 1>&2
+        handleExit 1
     fi
     cd -
 
@@ -88,7 +100,7 @@ main() {
     echo "$VARCHIVE_PATH/shell/varchive-start"
 
     touch successfully_installed.flag
-    exit 0
+    handleExit 0
 }
 
 main

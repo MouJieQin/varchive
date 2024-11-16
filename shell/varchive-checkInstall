@@ -1,0 +1,21 @@
+#!/bin/bash --login
+
+# Get the directory of the script
+SCRIPT_DIR=$(dirname "$0")
+SCRIPT_PARENT_DIR=$(
+    cd "$SCRIPT_DIR/.."
+    pwd
+)
+if [ -z $1 ]; then
+    if [ ! -f $SCRIPT_PARENT_DIR/successfully_installed.flag ]; then
+        echo "Error: successfully_installed.flag is not exist." 1>&2
+        exit 1
+    fi
+
+elif [[ $1=="closed" ]]; then
+    VARCHIVE_INSTALL_CLOSE_FLAG_PATH="/tmp/varchive_install_close.flag"
+    while [ ! -f $VARCHIVE_INSTALL_CLOSE_FLAG_PATH ]; do
+        sleep 1
+    done
+fi
+exit 0

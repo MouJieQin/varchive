@@ -6,6 +6,8 @@ const { dialog } = require("electron");
 const splits = __dirname.split("/");
 const varchivePath = splits.splice(0, splits.length - 2).join("/");
 
+const checkInstallPath = varchivePath.concat("/shell/varchive-checkInstall");
+const installPath = varchivePath.concat("/install");
 const startPath = varchivePath.concat("/shell/varchive-start");
 
 function runShellCommand(command) {
@@ -20,20 +22,71 @@ function runShellCommand(command) {
   });
 }
 
+async function install() {
+  const installCmd = "open ".concat(
+    installPath,
+    " && sleep 3 && ",
+    checkInstallPath,
+    " closed"
+  );
+  console.log("installCmd:", installCmd);
+  return await runShellCommand(installCmd)
+    .then((stdout) => {
+      console.log("Output:", stdout);
+      return 0;
+    })
+    .catch(async ({ error, stderr }) => {
+      const options = {
+        type: "error",
+        message: `${installPath}`,
+        detail: `${stderr}`,
+        buttons: ["OK"],
+      };
+      await dialog.showMessageBox(options);
+      return 1;
+    });
+}
+
+async function checkInstall() {
+  return await runShellCommand(checkInstallPath)
+    .then((stdout) => {
+      return 0;
+    })
+    .catch(async ({ error, stderr }) => {
+      const options = {
+        type: "info",
+        message:
+          "You will be asked to input your system password during the install process.",
+        detail: `${stderr}`,
+        buttons: ["Exit", "Install"],
+      };
+      const responses = await dialog.showMessageBox(options);
+      if (responses.response === 0) {
+        // Exit button pressed
+        return -1;
+      } else if (responses.response === 1) {
+        // Install button pressed
+        await install();
+        return await checkInstall();
+      }
+      return -2;
+    });
+}
+
 async function startServer() {
   await runShellCommand(startPath)
     .then((stdout) => {
-      console.log("Output:", stdout);
-      // Continue your code here
+      console.log("Output:", `${stdout}`);
+      return;
     })
-    .catch(({ error, stderr }) => {
+    .catch(async ({ error, stderr }) => {
       const options = {
         type: "error",
-        title: "Error",
-        message: `${startPath},${stderr}`,
+        message: `${startPath}`,
+        detail: `${stderr}`,
         buttons: ["OK"],
       };
-      dialog.showMessageBox(options);
+      await dialog.showMessageBox(options);
       return;
     });
 }
@@ -61,13 +114,18 @@ function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  await startServer();
-  createWindow();
-  app.on("activate", function () {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
-  });
+  const res = await checkInstall();
+  if (res !== 0) {
+    app.quit();
+  } else {
+    await startServer();
+    createWindow();
+    app.on("activate", function () {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+      }
+    });
+  }
 });
 
 app.on("window-all-closed", function () {

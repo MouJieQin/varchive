@@ -7,7 +7,7 @@ ps -ef | grep node | grep -i varchive | grep -v grep | awk '{print $2}' | xargs 
 TOTAL=5
 count=0
 while ps -ef | grep varchive-server.py | grep -v grep; do
-    let count=count+1
+    ((count++))
     if [ $count -ge $TOTAL ]; then
         ps -ef | grep varchive-server.py | grep -v grep | awk '{print $2}' | xargs -I {} kill -9 {}
     fi
@@ -16,7 +16,7 @@ done
 
 count=0
 while ps -ef | grep varchive-client | grep -v grep; do
-    let count=count+1
+    ((count++))
     if [ $count -ge $TOTAL ]; then
         ps -ef | grep varchive-client | grep -v grep | awk '{print $2}' | xargs -I {} kill -9 {}
     fi
@@ -25,7 +25,7 @@ done
 
 count=0
 while ps -ef | grep node | grep -i varchive | grep -v grep; do
-    let count=count+1
+    ((count++))
     if [ $count -ge $TOTAL ]; then
         ps -ef | grep node | grep -i varchive | grep -v grep | awk '{print $2}' | xargs -I {} kill -9 {}
     fi

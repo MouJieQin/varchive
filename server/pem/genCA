@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash --login
 
 #Generate root certificate
 openssl genrsa -out rootCA.key 2048

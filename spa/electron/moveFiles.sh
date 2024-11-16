@@ -21,9 +21,8 @@ for file in $(git ls-files); do
     fi
     cp "$file" "$theResourceDir"
 done
-mv "/tmp/node_modules" "$RESOURCE_DIR/spa/"
-cp -r "server/pem"  "$RESOURCE_DIR/server/"
-touch "$RESOURCE_DIR/successfully_installed.flag"
-# cp -r "spa/node_modules" "$RESOURCE_DIR/spa/"
-# rsync -av --progress --exclude='*app-builder*' --exclude='*electron*' "spa/node_modules" "$RESOURCE_DIR/spa/"
+cd -
+
+cd "$RESOURCE_DIR/spa/"
+npm install --omit=dev
 cd -
