@@ -235,7 +235,9 @@ async def openFileOnFinder(request: Request, path: str = ""):
     path = FILE_MANAGER_ABS_PATH + "/" + path
     if not os.path.exists(path):
         raise HTTPException(status_code=400, detail="Not a file or does not exist")
-    command = ["open", path]
+    command = ["open", "-R", path]
+    SystemRunner.put(command)
+    command = ["osascript", "-e", 'tell application "Finder" to activate']
     SystemRunner.put(command)
     return {"statue": "running"}
 
