@@ -24,5 +24,5 @@ done
 cd -
 
 cd "$RESOURCE_DIR/spa/"
-npm install --omit=dev
+npm install
 cd -

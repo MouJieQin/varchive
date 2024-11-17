@@ -37,5 +37,5 @@ spa/src/data.json
 spa/src/placeholder.ts
 
 # electron
-spa/dist_electron/
+electron/Varchive/dist_electron
 *.flag

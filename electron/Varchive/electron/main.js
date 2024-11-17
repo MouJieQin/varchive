@@ -4,7 +4,7 @@ const { exec } = require("child_process");
 const { dialog } = require("electron");
 
 const splits = __dirname.split("/");
-const varchivePath = splits.splice(0, splits.length - 3).join("/");
+const varchivePath = splits.splice(0, splits.length - 2).join("/");
 
 const checkInstallPath = varchivePath.concat("/shell/varchive-checkInstall");
 const installPath = varchivePath.concat("/install");
