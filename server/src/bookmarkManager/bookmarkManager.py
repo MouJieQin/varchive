@@ -27,6 +27,7 @@ class BookmarkManager:
         sendText: Callable,
         broadcastToIinas: Callable,
         broadcastToVarchives: Callable,
+        putMessageToBroadcastVarchives: Callable,
         messageQueue: messageQueue.MessageQueue,
         ResourceMap: ResourceMapManager,
     ):
@@ -36,6 +37,7 @@ class BookmarkManager:
         self.sendText = sendText
         self.broadcastToIinas = broadcastToIinas
         self.broadcastToVarchives = broadcastToVarchives
+        self.putMessageToBroadcastVarchives = putMessageToBroadcastVarchives
         self.isWebsocketClosed = False
         self.messageQueue = messageQueue
         self.ResourceMap = ResourceMap
@@ -126,9 +128,16 @@ class BookmarkManager:
                 )
             )
 
-    async def _syncInformation(self):
+    def _putMessageToBroadcastDetailsMessageToVarchives(self, type: str):
+        detailsInfo = {
+            "type": ["varchive", "details", type],
+            "message": json.dumps(self.infoJson),
+        }
+        self.putMessageToBroadcastVarchives(json.dumps(detailsInfo))
+
+    def _syncInformation(self):
         self._syncInfoToFile()
-        await self._sendDetailsMessageForVarchive("info", isBroadcast=True)
+        self._putMessageToBroadcastDetailsMessageToVarchives("info")
 
     def _initDetails(self):
         linkPath = ""
@@ -240,32 +249,30 @@ class BookmarkManager:
     def _removeFilesAboutBookmark(self, bookmark: Dict):
         self._removeClipFiles(bookmark["clip"])
 
-    async def __changeImg(
-        self, clip: Dict, webp: str, png: str, syncVarchive: Callable
-    ):
+    def __changeImg(self, clip: Dict, webp: str, png: str, syncVarchive: Callable):
         clip["webp"] = webp
         clip["cover"] = png
-        await syncVarchive()
+        syncVarchive()
 
-    async def __changeImgWhileReady(self, clip: Dict, syncVarchive: Callable):
-        await self.__changeImg(
+    def __changeImgWhileReady(self, clip: Dict, syncVarchive: Callable):
+        self.__changeImg(
             clip, "/icons/infinity.webp", "/icons/infinity.webp", syncVarchive
         )
 
-    async def __changeImgWhileRunning(self, clip: Dict, syncVarchive: Callable):
-        await self.__changeImg(
+    def __changeImgWhileRunning(self, clip: Dict, syncVarchive: Callable):
+        self.__changeImg(
             clip, "/icons/loading.webp", "/icons/loading.webp", syncVarchive
         )
 
-    async def __changeImgWhenCancedOrFailed(self, clip: Dict, syncVarchive: Callable):
-        await self.__changeImg(
+    def __changeImgWhenCancedOrFailed(self, clip: Dict, syncVarchive: Callable):
+        self.__changeImg(
             clip, "/icons/landscape.png", "/icons/landscape.png", syncVarchive
         )
 
-    async def _changeImgWhileDone(
+    def _changeImgWhileDone(
         self, clip: Dict, webp: str, png: str, syncVarchive: Callable
     ):
-        await self.__changeImg(clip, webp, png, syncVarchive)
+        self.__changeImg(clip, webp, png, syncVarchive)
 
     def __getRelativeWebpPngPath(self, outputPath: str) -> List[str]:
         webpFileName = os.path.basename(outputPath)
@@ -273,7 +280,7 @@ class BookmarkManager:
         pngRelativePath = webpRelativePath + ".png"
         return (webpRelativePath, pngRelativePath)
 
-    async def _genWebpCallback(
+    def _genWebpCallback(
         self,
         status: TaskStatus,
         outPath: str,
@@ -287,18 +294,18 @@ class BookmarkManager:
     ):
         try:
             if status == TaskStatus.READY:
-                await self.__changeImgWhileReady(clip, syncVarchive)
+                self.__changeImgWhileReady(clip, syncVarchive)
                 print("TaskStatus.READY:", outPath)
             elif status == TaskStatus.CANCELED:
                 self._removeFile(outPath)
-                await self.__changeImgWhenCancedOrFailed(clip, syncVarchive)
+                self.__changeImgWhenCancedOrFailed(clip, syncVarchive)
                 print("TaskStatus.CANCELED:", outPath)
             elif status == TaskStatus.RUNNING:
                 print("TaskStatus.RUNNING:", outPath)
-                await self.__changeImgWhileRunning(clip, syncVarchive)
+                self.__changeImgWhileRunning(clip, syncVarchive)
             elif status == TaskStatus.FAILED:
                 self._removeFile(outPath)
-                await self.__changeImgWhenCancedOrFailed(clip, syncVarchive)
+                self.__changeImgWhenCancedOrFailed(clip, syncVarchive)
                 print("TaskStatus.FAILED:", outPath)
             elif status == TaskStatus.DONE:
                 print("TaskStatus.DONE:", outPath)
@@ -306,7 +313,7 @@ class BookmarkManager:
                 (webpRelativePath, pngRelativePath) = self.__getRelativeWebpPngPath(
                     outPath
                 )
-                await self._changeImgWhileDone(
+                self._changeImgWhileDone(
                     clip, webpRelativePath, pngRelativePath, syncVarchive
                 )
                 # It will coverwrite the cover, disable it currently.
@@ -316,7 +323,7 @@ class BookmarkManager:
                 #     (webpRelativePath, pngRelativePath) = self.__getRelativeWebpPngPath(
                 #         previewWebpCoverPath
                 #     )
-                #     await self._changeImgWhileDone(
+                #     self._changeImgWhileDone(
                 #         cover, webpRelativePath, pngRelativePath, syncVarchive
                 #     )
             else:
@@ -354,6 +361,13 @@ class BookmarkManager:
             "message": json.dumps(self.bookmarkJson),
         }
         await self.broadcastToVarchives(json.dumps(bookmarkInfo))
+
+    def _putMessageToBroadcastBookmarkInfoToVarchives(self):
+        bookmarkInfo = {
+            "type": ["varchive", "bookmarks", "info"],
+            "message": json.dumps(self.bookmarkJson),
+        }
+        self.putMessageToBroadcastVarchives(json.dumps(bookmarkInfo))
 
     async def _sendMessageToVarchives(self, infoType: str):
         bookmarkInfo = {
@@ -447,6 +461,7 @@ class IINAbookmarkManager(BookmarkManager):
         sendText: Callable,
         broadcastToIinas: Callable,
         broadcastToVarchives: Callable,
+        putMessageToBroadcastVarchives: Callable,
         messageQueue: messageQueue.MessageQueue,
         ResourceMap: ResourceMapManager,
     ):
@@ -456,6 +471,7 @@ class IINAbookmarkManager(BookmarkManager):
             sendText,
             broadcastToIinas,
             broadcastToVarchives,
+            putMessageToBroadcastVarchives,
             messageQueue,
             ResourceMap,
         )
@@ -473,9 +489,9 @@ class IINAbookmarkManager(BookmarkManager):
             BookmarksUsing[self.bookmarkPath] = self.bookmarkJson
             self._syncBookmarksToFile()
 
-    async def _syncBookmarks(self):
+    def _syncBookmarks(self):
         self._syncBookmarksToFile()
-        await self._broadcastBookmarkInfoToVarchives()
+        self._putMessageToBroadcastBookmarkInfoToVarchives()
 
     async def __handleFetch(self):
         print(
@@ -574,6 +590,7 @@ class VarchiveBookmarkManager(BookmarkManager):
         sendText: Callable,
         broadcastToIinas: Callable,
         broadcastToVarchives: Callable,
+        putMessageToBroadcastVarchives: Callable,
         messageQueue: messageQueue.MessageQueue,
         ResourceMap: ResourceMapManager,
     ):
@@ -583,6 +600,7 @@ class VarchiveBookmarkManager(BookmarkManager):
             sendText,
             broadcastToIinas,
             broadcastToVarchives,
+            putMessageToBroadcastVarchives,
             messageQueue,
             ResourceMap,
         )

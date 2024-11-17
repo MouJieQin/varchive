@@ -11,7 +11,6 @@ import urllib.parse
 from .messageQueue import MessageQueue
 from typing import *
 from fastapi import WebSocket
-import bookmarkManager.bookmarkManager as bkmarkManager
 import infoManager.infoManager as infoManager
 import videoStatistics.videoStatistics as videoStatistics
 
@@ -44,6 +43,8 @@ class WebSocketManager:
         self.sendTextToVarchiveLocks: List[asyncio.Lock] = [
             asyncio.Lock() for i in range(0, self.maxConnection)
         ]
+
+        self.messagesToVarchive: List[List] = [[] for i in range(0, self.maxConnection)]
 
         self.messagesFromIina: list[MessageQueue] = [
             MessageQueue(self.maxMessage) for i in range(0, self.maxConnection)
@@ -78,6 +79,13 @@ class WebSocketManager:
         manageVIconnectionThread.daemon = True
         manageVIconnectionThread.start()
 
+        def run_async_task():
+            asyncio.run(self.sendMessageFromDequeToVarchive())
+
+        manageSendMessageThread = threading.Thread(target=run_async_task)
+        manageSendMessageThread.daemon = True
+        manageSendMessageThread.start()
+
     async def sendTextToIina(self, ID: int, text: str):
         try:
             # Acquire the lock before sending the message
@@ -88,7 +96,7 @@ class WebSocketManager:
             print(f"An error occurred while sending text to IINA[{ID}]: {e}")
             self.disconnectIina(ID)
 
-    async def sendTextToVarchive(self, ID: int, text: str):
+    async def sendTextToVarchiveImple(self, ID: int, text: str):
         try:
             # Acquire the lock before sending the message
             async with self.sendTextToVarchiveLocks[ID]:
@@ -97,6 +105,26 @@ class WebSocketManager:
         except Exception as e:
             print(f"An error occurred while sending text to Varchive[{ID}]: {e}")
             self.disconnectVarchive(ID)
+
+    async def sendTextToVarchive(self, ID: int, text: str):
+        self.messagesToVarchive[ID].append(text)
+
+    async def sendMessageFromDequeToVarchive(self):
+        while True:
+            for id in range(0, self.maxConnection):
+                while len(self.messagesToVarchive[id]) != 0:
+                    message = self.messagesToVarchive[id].pop(0)
+                    await self.sendTextToVarchiveImple(id, message)
+            await self.sleep()
+
+    def putMessageToVarchive(self, ID: int, text: str):
+        self.messagesToVarchive[ID].append(text)
+
+    def putMessageToBroadcastVarchives(self, metaPath: str, text: str):
+        if metaPath not in self.metaFilenameMapVarchiveID.keys():
+            return
+        for id in self.metaFilenameMapVarchiveID[metaPath]:
+            self.putMessageToVarchive(id, text)
 
     async def broadcastToIinasByMetaPath(self, metaPath: str, text: str):
         try:
@@ -374,6 +402,7 @@ class WebSocketManager:
                     lambda text: self.sendTextToIina(ID, text),
                     lambda text: self.broadcastToIinasByMetaPath(metaPath, text),
                     lambda text: self.broadcastToVarchivesByMetaPath(metaPath, text),
+                    lambda text: self.putMessageToBroadcastVarchives(metaPath, text),
                     messages,
                     self.ResourceMap,
                 )
@@ -421,6 +450,7 @@ class WebSocketManager:
                     lambda text: self.sendTextToVarchive(ID, text),
                     lambda text: self.broadcastToIinasByMetaPath(metaPath, text),
                     lambda text: self.broadcastToVarchivesByMetaPath(metaPath, text),
+                    lambda text: self.putMessageToBroadcastVarchives(metaPath, text),
                     messages,
                     self.ResourceMap,
                 )

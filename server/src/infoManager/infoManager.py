@@ -14,6 +14,7 @@ class IINAinfoManager(IINAbookmarkManager):
         sendText: Callable,
         broadcastToIinas: Callable,
         broadcastToVarchives: Callable,
+        putMessageToBroadcastVarchives: Callable,
         messageQueue: messageQueue.MessageQueue,
         ResourceMap: ResourceMapManager,
     ):
@@ -23,6 +24,7 @@ class IINAinfoManager(IINAbookmarkManager):
             sendText,
             broadcastToIinas,
             broadcastToVarchives,
+            putMessageToBroadcastVarchives,
             messageQueue,
             ResourceMap,
         )
@@ -160,6 +162,7 @@ class VarchiveInfoManager(VarchiveBookmarkManager):
         sendText: Callable,
         broadcastToIinas: Callable,
         broadcastToVarchives: Callable,
+        putMessageToBroadcastVarchives: Callable,
         messageQueue: messageQueue.MessageQueue,
         ResourceMap: ResourceMapManager,
     ):
@@ -169,6 +172,7 @@ class VarchiveInfoManager(VarchiveBookmarkManager):
             sendText,
             broadcastToIinas,
             broadcastToVarchives,
+            putMessageToBroadcastVarchives,
             messageQueue,
             ResourceMap,
         )
@@ -277,7 +281,7 @@ class VarchiveInfoManager(VarchiveBookmarkManager):
             )
         for url in oldURLsNotInNew:
             self.ResourceMap.deleteURLFromVarchive(url)
-            
+
         self.infoJson["path"] = urls
         await self.__syncEditedInformation()
 
@@ -348,7 +352,7 @@ class VarchiveInfoManager(VarchiveBookmarkManager):
                     "endTime": endTime,
                 }
             )
-            await self._syncInformation()
+            self._syncInformation()
             clip = self.infoJson["previews"]["clips"][-1]
             videoEditor.genWebp(
                 startTime,
