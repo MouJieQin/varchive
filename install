@@ -8,30 +8,24 @@ cd "$VARCHIVE_PATH"
 
 VARCHIVE_INSTALL_CLOSE_FLAG_PATH="/tmp/varchive_install_close.flag"
 
-rm $VARCHIVE_INSTALL_CLOSE_FLAG_PATH
+rm $VARCHIVE_INSTALL_CLOSE_FLAG_PATH 2>&1 >/dev/null
 
 handleExit() {
     echo $1 >$VARCHIVE_INSTALL_CLOSE_FLAG_PATH
     exit $1
 }
 
+trap 'handleExit 1' EXIT
+
 if [ -f successfully_installed.flag ]; then
     echo "Successfully installed before, If you want to reinstall, just remove $VARCHIVE_PATH/successfully_installed.flag"
     handleExit 0
 fi
 
-checkExist() {
-    cmd="$1"
-    if $cmd --help >/dev/null; then
-        return 0
-    fi
-    return 1
-}
-
 installIfNotExist() {
     cmd="$1"
-    if ! checkExist "$cmd"; then
-        export HOMEBREW_NO_AUTO_UPDATE=false
+    if ! which "$cmd"; then
+        export HOMEBREW_NO_AUTO_UPDATE=1
         if ! brew install "$cmd"; then
             echo "Error: Cannot install $cmd" 1>&2
             handleExit 1
@@ -39,35 +33,49 @@ installIfNotExist() {
     fi
 }
 
+installNpmIfNotExist() {
+    if ! which npm; then
+        brew install nvm
+        mkdir -p ~/.nvm
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "/usr/local/opt/nvm/nvm.sh" ] && \. "/usr/local/opt/nvm/nvm.sh"                                       # This loads nvm
+        [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/usr/local/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
+        nvm install 23.1.0
+        ln -s "$(which npm)" /usr/local/bin/npm
+        ln -s "$(which node)" /usr/local/bin/node
+    fi
+}
+
 main() {
 
-    if ! checkExist 'brew'; then
+    if ! which 'brew'; then
         if ! /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"; then
             echo "Error: Cannot install brew" 1>&2
             handleExit 1
         fi
     fi
-    if ! checkExist 'python3.9'; then
+
+    installNpmIfNotExist
+    installIfNotExist "ffmpeg"
+    installIfNotExist "yt-dlp"
+
+    cd spa
+    if ! npm install --omit=dev; then
+        echo "Error: npm install failed!" 1>&2
+        handleExit 1
+    fi
+    cd -
+
+    if ! which 'python3.9'; then
         if ! brew install python@3.9; then
             echo "Error: Cannot install python@3.9" 1>&2
             handleExit 1
         fi
     fi
 
-    installIfNotExist "npm"
-    installIfNotExist "ffmpeg"
-    installIfNotExist "yt-dlp"
-
     cd server/src
     if ! python3.9 -m pip install -r requirements.txt; then
         echo "Error: Pythone cannot install all lib in the requirements.txt" 1>&2
-        handleExit 1
-    fi
-    cd -
-
-    cd spa
-    if ! npm install --omit=dev; then
-        echo "Error: npm install failed!" 1>&2
         handleExit 1
     fi
     cd -

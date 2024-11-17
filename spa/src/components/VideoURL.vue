@@ -1,6 +1,5 @@
 <template>
     <div style="display: flex; align-items: center;">
-        <!-- <div class="flex flex-wrap gap-4 items-center"> -->
         <el-select v-model="selectedURL" placeholder="URL" size="default"
             style="width: 100px; margin-top:20px; margin-bottom:20px;text-align: center">
             <el-option v-for="path in paths" :key="path.url" :label="path.url" :value="path.url" />
@@ -10,15 +9,17 @@
         </el-icon>
     </div>
     <div v-if="isEditing">
-        <el-icon class="icon" style="margin-left: 15px">
-            <Close @click="isEditing = false" />
-        </el-icon>
-        <el-icon class="icon" style="margin-left: 15px">
-            <Check @click="handleUpdateURL" />
-        </el-icon>
-        <el-icon class="icon" style="margin-left: 15px">
-            <Plus @click="addUrl" />
-        </el-icon>
+        <div style="margin-bottom: 15px;">
+            <el-icon class="icon" style="margin-left: 15px">
+                <Close @click="isEditing = false" />
+            </el-icon>
+            <el-icon class="icon" style="margin-left: 15px">
+                <Check @click="handleUpdateURL" />
+            </el-icon>
+            <el-icon class="icon" style="margin-left: 15px">
+                <Plus @click="addUrl" />
+            </el-icon>
+        </div>
         <div v-for="(url, index) in urls" style="margin-bottom: 10px;">
             <el-input v-model="url.url" clearable style="max-width: 600px">
                 <template #prepend>URL</template>
@@ -57,6 +58,9 @@ export default {
         updateURL: { type: Function, required: true }
     },
     watch: {
+        paths(newPaths, old) {
+            this.initUrlSelected()
+        },
         selectedURL(newUrl, oldUrl) {
             this.setSeletedURL(newUrl)
         }
@@ -110,23 +114,3 @@ export default {
     }
 }
 </script>
-
-<!-- <style>
-.el-input__wrapper {
-    background-color: rgba(32, 35, 41, 1);
-    border-color: blueviolet;
-    border: 20px;
-}
-
-.el-input-group__prepend {
-    background-color: rgba(32, 35, 41, 1);
-    border-color: blueviolet;
-    border: 20px;
-
-}
-
-.el-input-group__append {
-    background-color: rgba(32, 35, 41, 1);
-    border-color: blueviolet;
-}
-</style> -->

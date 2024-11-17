@@ -56,7 +56,7 @@ async function checkInstall() {
       const options = {
         type: "info",
         message:
-          "You will be asked to input your system password during the install process.",
+          "You will be asked to input your system password into a terminal app installing dependences.",
         detail: `${stderr}`,
         buttons: ["Exit", "Install"],
       };

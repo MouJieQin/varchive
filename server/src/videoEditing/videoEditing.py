@@ -15,7 +15,8 @@ PQueue = ProcessQueue(maxSize=1)
 
 class VideoEditing:
     # .webp .gif
-    webpFormat=".webp" 
+    webpFormat = ".webp"
+
     def __init__(self, videoPath: str, isNetworkResource: bool):
         self.videoPath: str = videoPath
         self.isNetworkResource: bool = isNetworkResource
@@ -199,6 +200,12 @@ class VideoEditing:
         ]
         shellCmd = " ".join(args)
         if self.isNetworkResource:
-            shellCmd = downloadSectionCmd + " && " + shellCmd + " && rm -f " + videoPath
+            shellCmd = (
+                downloadSectionCmd
+                + " && "
+                + shellCmd
+                + " && rm -f "
+                + self.genEscapeCharacter(videoPath)
+            )
         print("#####shellCmd:", shellCmd)
         return shellCmd
