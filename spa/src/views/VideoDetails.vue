@@ -205,6 +205,7 @@ import SubtitleSelector from '@/components/SubtitleSelector.vue'
 import VideoURL from '@/components/VideoURL.vue'
 import Anchor from '@/views/Anchor.vue'
 import VideoStatisticsShow from '@/views/VideoStatisticsShow.vue'
+import { loadVideoInfo } from '@/common/varchiveVideo.js'
 import { ElMessage, ElNotification, ElMessageBox } from 'element-plus';
 import { markRaw } from 'vue'
 
@@ -799,11 +800,22 @@ export default {
         async sendMessage(message) {
             console.log("message:", message)
             await this.webSocket.send(message)
-        }
+        },
+        async loadInfo() {
+            const res = await loadVideoInfo(this.$route.path)
+            if (res.returnCode !== 0) {
+                return
+            }
+            this.currentPath = res.currentPath
+            this.videoPath = res.videoPath
+            this.webpPath = res.webpPath
+            this.videoInfo = res.videoInfo
+        },
     },
     async created() {
         await this.webSocketManager()
-        await this.loadJson()
+        await this.loadInfo()
+        // await this.loadJson()
         await this.loadElements()
         document.title = this.videoInfo.title
     },

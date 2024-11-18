@@ -8,11 +8,15 @@
         </router-link>
     </div>
     <router-view></router-view>
+    <div>
+        <Covers :routeName="currRouterName" :fileStatusCode="fileStatusCode" :folders="folders" />
+    </div>
 </template>
 
 <script>
 import { onBeforeRouteLeave } from 'vue-router'
 import config from '@/config.json'
+import Covers from '@/views/Covers.vue'
 export default {
     data() {
         return {
@@ -21,8 +25,10 @@ export default {
             dirs: [],
             mouseOverRouterLink: "",
             isMetaKeyDown: false,
+            currRouterName: "",
         }
     },
+    components: { Covers },
     computed: {
         hasRoute() {
             return this.dirs.length == 0
@@ -118,10 +124,19 @@ export default {
                     }
                 )
             }
+            // this.$router.addRoute(currRouterName,
+            //     {
+            //         path: "covers",
+            //         name: currRouterName.concat("/covers"),
+            //         component: () => import('@/views/Covers.vue'),
+            //         props: route => ({ ...route.params })
+            //     }
+            // )
         },
     },
     async created() {
-        await this.initData(this.$route.name)
+        this.currRouterName = this.$route.name
+        await this.initData(this.currRouterName)
         const slices = this.$route.name.split('/')
         document.title = slices[slices.length - 1]
     },
