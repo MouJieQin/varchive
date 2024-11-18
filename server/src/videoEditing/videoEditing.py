@@ -6,8 +6,6 @@ from .processQueue import *
 import subprocess
 import multiprocessing
 
-# from concurrent.futures import ThreadPoolExecutor
-import cv2
 
 Num_cores = multiprocessing.cpu_count()
 PQueue = ProcessQueue(maxSize=1)
@@ -34,39 +32,29 @@ class VideoEditing:
         if self.__videoDuration > 0:
             return self.__videoDuration
         else:
-            if not self.isNetworkResource:
-                cap = cv2.VideoCapture(self.videoPath)
-                if cap.isOpened():
-                    rate = cap.get(5)
-                    frame_num = cap.get(7)
-                    duration = frame_num / rate
-                    self.__videoDuration = duration
-                    return duration
+            args = [
+                "ffprobe",
+                "-i",
+                self.videoPath,
+                "-show_entries",
+                "format=duration",
+                "-v",
+                "quiet",
+                "-of",
+                "csv=p=0",
+            ]
+            res = subprocess.run(args=args, capture_output=True, text=True)
+            if res.returncode != 0:
+                print(res.stdout, res.stderr)
                 return -1
             else:
-                args = [
-                    "ffprobe",
-                    "-i",
-                    self.videoPath,
-                    "-show_entries",
-                    "format=duration",
-                    "-v",
-                    "quiet",
-                    "-of",
-                    "csv=p=0",
-                ]
-                res = subprocess.run(args=args, capture_output=True, text=True)
-                if res.returncode != 0:
-                    print(res.stdout, res.stderr)
+                try:
+                    self.__videoDuration = float(res.stdout)
+                    print("self.__videoDuration:", self.__videoDuration)
+                    return self.__videoDuration
+                except Exception as e:
+                    print("Error while acquiring video duration:{}".format(e))
                     return -1
-                else:
-                    try:
-                        self.__videoDuration = float(res.stdout)
-                        print("self.__videoDuration:", self.__videoDuration)
-                        return self.__videoDuration
-                    except Exception as e:
-                        print("Error while acquiring video duration:{}".format(e))
-                        return -1
 
     def getNetworkResourceExt(self) -> str:
         if self.networkResourceExt != "":

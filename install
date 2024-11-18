@@ -60,7 +60,7 @@ main() {
     installIfNotExist "yt-dlp"
 
     cd spa
-    if ! npm install --omit=dev; then
+    if ! npm install; then
         echo "Error: npm install failed!" 1>&2
         handleExit 1
     fi

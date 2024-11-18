@@ -7,13 +7,10 @@ SCRIPT_PARENT_DIR=$(
     pwd
 )
 
-# if ! $SCRIPT_DIR/varchive-checkInstall; then
-#     echo "Some dependences have to be installed first. You will be asked to input your system password during the install process."
-#     if ! open $SCRIPT_PARENT_DIR/install; then
-#         echo "Install failed!" 1>&2
-#         exit 1
-#     fi
-# fi
+if ! $SCRIPT_DIR/varchive-checkInstall; then
+    echo "Some dependences have to be installed first." 1>&2
+    exit 1
+fi
 
 if ! ps -ef | grep varchive-server.py | grep -v grep; then
     cd "$SCRIPT_DIR/../server/src"
