@@ -33,12 +33,12 @@ class IINAinfoManager(IINAbookmarkManager):
 
     def __initData(self):
         if os.path.exists(self.detailsPath):
-            if self.url in self.ResourceMap.infoUsing.keys():
-                self.infoJson = self.ResourceMap.infoUsing[self.url]
+            if self.detailsPath in self.ResourceMap.infoUsing.keys():
+                self.infoJson = self.ResourceMap.infoUsing[self.detailsPath]
             else:
                 with open(self.detailsPath, mode="r", encoding="utf-8") as f:
-                    self.ResourceMap.infoUsing[self.url] = json.load(f)
-                self.infoJson = self.ResourceMap.infoUsing[self.url]
+                    self.ResourceMap.infoUsing[self.detailsPath] = json.load(f)
+                self.infoJson = self.ResourceMap.infoUsing[self.detailsPath]
 
     async def __initDetails(self):
         if os.path.exists(self.detailsPath):

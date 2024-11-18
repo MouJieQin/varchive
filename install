@@ -27,7 +27,7 @@ installIfNotExist() {
     if ! which "$cmd"; then
         export HOMEBREW_NO_AUTO_UPDATE=1
         if ! brew install "$cmd"; then
-            echo "Error: Cannot install $cmd" 1>&2
+            echo "Error: Cannot install $cmd." 1>&2
             handleExit 1
         fi
     fi
@@ -40,7 +40,10 @@ installNpmIfNotExist() {
         export NVM_DIR="$HOME/.nvm"
         [ -s "/usr/local/opt/nvm/nvm.sh" ] && \. "/usr/local/opt/nvm/nvm.sh"                                       # This loads nvm
         [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/usr/local/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
-        nvm install 23.1.0
+        if ! nvm install stable; then
+            echo "Error: Cannot install node/npm." 1>&2
+            handleExit 1
+        fi
         ln -s "$(which npm)" /usr/local/bin/npm
         ln -s "$(which node)" /usr/local/bin/node
     fi
