@@ -778,6 +778,9 @@ export default {
             this.webpPath = res.webpPath
             this.videoInfo = res.videoInfo
         },
+        goToIntroduce() {
+            document.getElementById("introduction").scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' })
+        }
     },
     async created() {
         await this.webSocketManager()
@@ -785,6 +788,7 @@ export default {
         // await this.loadJson()
         await this.loadElements()
         document.title = this.videoInfo.title
+        this.goToIntroduce()
     },
     async beforeUnmount() {
         this.isBeforeUnmount = true
