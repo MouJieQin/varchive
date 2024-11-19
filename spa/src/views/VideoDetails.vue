@@ -197,7 +197,7 @@
 
 <script>
 import config from '@/config.json'
-import { Search, CopyDocument, Plus, View, Hide, CircleCheck, CircleCheckFilled, WarningFilled, Check, Close, Edit, Refresh, Delete, VideoPlay, VideoPause, Film, RefreshLeft, Grid, List } from '@element-plus/icons-vue'
+import { Search, View, Hide, CircleCheck, CircleCheckFilled, WarningFilled, Check, Close, Edit, Refresh, Delete, VideoPlay, VideoPause, Film, RefreshLeft, Grid, List } from '@element-plus/icons-vue'
 import WebpPreview from '@/components/WebpPreview.vue'
 import Bookmark from '@/components/Bookmark.vue'
 import Subtitle from '@/components/Subtitle.vue'
@@ -654,7 +654,6 @@ export default {
                     }
                     else {
                         this.bookmarkInfo = JSON.parse(message.message)
-                        console.log("this.bookmarkInfo:", this.bookmarkInfo)
                     }
                     this.isHideBookmarks = this.bookmarkInfo.bookmarks.length === 0
                     break;

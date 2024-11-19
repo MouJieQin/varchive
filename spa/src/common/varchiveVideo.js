@@ -55,3 +55,31 @@ export const loadVideoInfo = async (path) => {
         videoInfo: videoInfo,
     };
 };
+
+export const loadBookmarks = async (videoPath) => {
+    const url = config.server.concat(
+        config.get.fetchJson,
+        "?path=",
+        videoPath,
+        "/bookmark.json"
+    );
+    console.log(url);
+    var bookmarks = {};
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(await response.text());
+        }
+        const resJson = await response.json();
+        bookmarks = JSON.parse(resJson.jsonStr);
+    } catch (error) {
+        console.log("Request Failed:", error);
+        return {
+            returnCode: 1,
+        };
+    }
+    return {
+        returnCode: 0,
+        bookmarks: bookmarks,
+    };
+};

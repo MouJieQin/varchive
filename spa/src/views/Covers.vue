@@ -2,8 +2,8 @@
     <div id="gallery" v-if="isShow">
         <section class="gallery">
             <div v-for="video in varchiveVideos" :key="video">
-                <Cover :videoInfo="videoInfos[video].videoInfo" :routePath="getRoutePath(video)"
-                    :webpPath="videoInfos[video].webpPath" :isPlay="false" />
+                <Cover :videoPath="videoInfos[video].videoPath" :videoInfo="videoInfos[video].videoInfo"
+                    :routePath="getRoutePath(video)" :webpPath="videoInfos[video].webpPath" :isPlay="false" />
             </div>
         </section>
         <el-backtop :bottom="20" />
