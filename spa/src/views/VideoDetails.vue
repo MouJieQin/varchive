@@ -457,38 +457,6 @@ export default {
             }
         },
 
-        async loadJson() {
-            const splits = this.$route.path.split('/')
-            this.currentPath = splits.slice(0, splits.length - 1).join('/')
-            const url_ = config.server.concat(config.get.realpath, "?path=", this.currentPath)
-            try {
-                const response = await fetch(url_)
-                if (!response.ok) {
-                    throw new Error(await response.text());
-                }
-                const resJson = await response.json()
-                this.videoPath = resJson.videoPath
-            } catch (error) {
-                console.log('Request Failed:', error);
-                return
-            }
-            console.log("this.videoPath:", this.videoPath)
-            this.webpPath = config.server.concat(config.get.fileDownload, "?path=", this.videoPath)
-            const url = config.server.concat(config.get.fetchJson, "?path=", this.videoPath, "/details.json")
-            console.log(url)
-            try {
-                const response = await fetch(url)
-                if (!response.ok) {
-                    throw new Error(await response.text());
-                }
-                const resJson = await response.json()
-                this.videoInfo = JSON.parse(resJson.jsonStr)
-                console.log(this.videoInfo)
-            } catch (error) {
-                console.log('Request Failed:', error);
-                return
-            }
-        },
         async fetchInfo() {
             await new Promise((resolve) => {
                 let timer = setInterval(() => {
