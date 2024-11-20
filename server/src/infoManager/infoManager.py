@@ -82,7 +82,7 @@ class IINAinfoManager(IINAbookmarkManager):
                 "notification",
                 "notification",
                 "Acquiring network video resource duration, please wait.",
-                self.url,
+                f"{startTime}s {self.url}",
             )
             self.putMessageToBroadcastVarchives(message)
         videoDuration = videoEditor.getVideoDuration()

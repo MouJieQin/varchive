@@ -1,6 +1,6 @@
 <template>
     <div id="gallery" v-if="isShow">
-        <section class="gallery">
+        <section class="gallery" :id="`gallery-${routeName}`">
             <div v-for="video in varchiveVideos" :key="video">
                 <Cover :videoPath="videoInfos[video].videoPath" :videoInfo="videoInfos[video].videoInfo"
                     :routePath="getRoutePath(video)" :webpPath="videoInfos[video].webpPath" :isPlay="false" />
@@ -19,6 +19,7 @@ export default {
         return {
             varchiveVideos: [],
             videoInfos: {},
+            timer: {},
         }
     },
     components: { Cover },
@@ -67,6 +68,28 @@ export default {
                 }
             }
         },
+        goToGallery() {
+            const ele = document.getElementById("gallery-".concat(this.routeName))
+            if (ele === null) {
+                return false
+            }
+            ele.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' })
+            return true
+        }
     },
+    created() {
+        this.timer = setInterval(() => {
+            if (!this.isShow) {
+                clearInterval(this.timer)
+            } else {
+                if (this.goToGallery()) {
+                    clearInterval(this.timer)
+                }
+            }
+        }, 300)
+    },
+    beforeUnmount() {
+        clearInterval(this.timer)
+    }
 }
 </script>
