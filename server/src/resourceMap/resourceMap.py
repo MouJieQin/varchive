@@ -140,6 +140,33 @@ class ResourceMapManager:
             with open(self.resourceMapPath, mode="r", encoding="utf-8") as f:
                 self.resourceMap = json.load(f)
 
+    def __classifyFile(self, path: str, fileName: str) -> Dict:
+        res = {"filename": fileName}
+        if not os.path.isdir(path):
+            res["type"] = "file"
+        else:
+            if self.isValidVarchiveVideo(path):
+                res["type"] = "varchive-video"
+            elif self.isVarchiveVideoLink(path):
+                res["type"] = "invalid-varchive-video"
+            else:
+                res["type"] = "directory"
+        return res
+
+    def listDir(self, path: str) -> List[Dict]:
+        realPath = self.FILE_MANAGER_ABS_PATH + "/" + path
+        if not os.path.exists(realPath):
+            return (-1, [])
+        if not os.path.isdir(realPath):
+            return (1, [])
+        if os.path.isdir(realPath) and self.isValidVarchiveVideo(realPath):
+            return (0, [])
+        res = []
+        files = sorted(os.listdir(realPath))
+        for file in files:
+            res.append(self.__classifyFile(realPath + "/" + file, file))
+        return (2, res)
+
     @staticmethod
     def createDirIfnotExists(path: str):
         if not os.path.exists(path):

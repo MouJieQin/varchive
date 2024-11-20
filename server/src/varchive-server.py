@@ -16,7 +16,6 @@ import plistlib
 import json
 import os
 from typing import *
-import fileManager.fileManager as fileManager
 import resourceMap.resourceMap as resourceMap
 import subtitle.subtitile
 import webSocketManager.webSocketManager as webSocketManager
@@ -139,10 +138,6 @@ async def websocketEndpointVarchive(websocket: WebSocket, clientID: int):
         WebsocketManager.disconnectVarchive(clientID)
 
 
-# filemanager
-FileManager = fileManager.FileManager(FILE_MANAGER_ABS_PATH, ResourceMap)
-
-
 class ListFiles(BaseModel):
     fileStatusCode: int = -1
     fileList: List[Dict] = []
@@ -150,7 +145,7 @@ class ListFiles(BaseModel):
 
 @app.get("/filemanager", response_model=ListFiles)
 async def videoListDir(request: Request, path: str = ""):
-    res = FileManager.listDir(path)
+    res = ResourceMap.listDir(path)
     return ListFiles(fileStatusCode=res[0], fileList=res[1])
 
 
