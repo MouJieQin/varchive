@@ -123,21 +123,23 @@ class ResourceMapManager:
         self.FILE_MANAGER_ABS_PATH = FILE_MANAGER_ABS_PATH
         self.metaPath = FILE_MANAGER_ABS_PATH + "/" + self.relMetaPath
         self.resourceMapPath = self.metaPath + "/resourceMap.json"
-        self.archivePath = FILE_MANAGER_ABS_PATH + "/video/Varchive"
+        self.macOSpath = FILE_MANAGER_ABS_PATH + "/video/macOS"
         self.AllPath = FILE_MANAGER_ABS_PATH + "/video/All"
-        self.recentPath = FILE_MANAGER_ABS_PATH + "/video/Recent"
+        self.ArchivesPath = FILE_MANAGER_ABS_PATH + "/video/Archives"
+        self.RecentPath = FILE_MANAGER_ABS_PATH + "/video/Recent"
         self.recentURL = "http://{}:{}/video/Recent".format(
             self.Config["varchive"]["host"], self.Config["varchive"]["port"]
         )
         ResourceMapManager.createDirIfnotExists(self.metaPath)
-        ResourceMapManager.createDirIfnotExists(self.archivePath)
+        ResourceMapManager.createDirIfnotExists(self.macOSpath)
         ResourceMapManager.symLinkIfnotExists(
-            self.USER_HOME_PATH, f"{self.archivePath}/Home"
+            self.USER_HOME_PATH, f"{self.macOSpath}/Home"
         )
         ResourceMapManager.createDirIfnotExists(self.AllPath)
-        ResourceMapManager.createDirIfnotExists(self.recentPath)
+        ResourceMapManager.createDirIfnotExists(self.RecentPath)
+        ResourceMapManager.createDirIfnotExists(self.ArchivesPath)
         self.recentManager = RecentManager(
-            self.recentPath, self.recentURL, SystemRunner, maxHistory=100
+            self.RecentPath, self.recentURL, SystemRunner, maxHistory=100
         )
         if os.path.exists(self.resourceMapPath):
             with open(self.resourceMapPath, mode="r", encoding="utf-8") as f:
@@ -179,7 +181,7 @@ class ResourceMapManager:
         recentList.sort(reverse=True)
         res = []
         for recent in recentList:
-            if self.isValidVarchiveVideoLink(self.recentPath + "/" + recent):
+            if self.isValidVarchiveVideoLink(self.RecentPath + "/" + recent):
                 res.append({"filename": recent, "type": "varchive-video"})
             else:
                 res.append({"filename": recent, "type": "invalid-varchive-video"})
@@ -189,7 +191,7 @@ class ResourceMapManager:
         realPath = self.FILE_MANAGER_ABS_PATH + "/" + path
         if realPath == self.AllPath:
             return self.__handleListAll()
-        elif realPath == self.recentPath:
+        elif realPath == self.RecentPath:
             return self.__handleListRecent()
         else:
             if not os.path.exists(realPath):
@@ -445,21 +447,20 @@ class ResourceMapManager:
         shutil.copyfile(srcLinkPath, linkPath)
 
     def createMetaPath(self, url: str, linkPath: str = "") -> str:
-        isNetworkResource = True
-        if linkPath:
-            isNetworkResource = False
         currTime = datetime.datetime.now()
         formattedCurrTime = currTime.strftime("%Y-%m-%d_%H-%M-%S.%f")[:-3]
         newMetaPath = self.metaPath + "/" + formattedCurrTime
-        if isNetworkResource:
-            linkPath = self.AllPath + "/" + formattedCurrTime
-        print(newMetaPath, linkPath)
+        archiveLinkPath = self.ArchivesPath + "/" + formattedCurrTime
         ResourceMapManager.createDirIfnotExists(newMetaPath)
-        ResourceMapManager.createDirIfnotExists(linkPath)
         ResourceMapManager.createDirIfnotExists(self.getWebpsPath(newMetaPath))
-        ResourceMapManager.createVarchiveLink(
-            self.getLinkPathByLinkDir(linkPath), formattedCurrTime
-        )
+        isNetworkResource = True
+        if linkPath:
+            isNetworkResource = False
+            ResourceMapManager.createDirIfnotExists(linkPath)
+            ResourceMapManager.createVarchiveLink(
+                self.getLinkPathByLinkDir(linkPath), formattedCurrTime
+            )
+        self.__createLinkDirToMetafile(archiveLinkPath, formattedCurrTime)
         if isNetworkResource:
             self.insert(url, formattedCurrTime)
         return newMetaPath
