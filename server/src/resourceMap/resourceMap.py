@@ -40,6 +40,9 @@ class RecentManager:
         # deleting local file is very dangerous
         shutil.rmtree(recentPath)
 
+    def getRecentList(self):
+        return [name for name in self.recentList]
+
     def openInVarchivebyMetaFilename(self, metaFilename: str):
         if metaFilename not in self.metaMapRecentName.keys():
             return
@@ -67,7 +70,7 @@ class RecentManager:
             ):
                 self.recentList.append(name)
 
-        self.recentList = sorted(self.recentList)
+        self.recentList.sort()
         for recentName in self.recentList:
             linkInfo = ResourceMapManager.getLinkInfoBylinkPath(
                 ResourceMapManager.getLinkPathByLinkDir(
@@ -171,21 +174,35 @@ class ResourceMapManager:
                 res.append({"filename": metaFilename, "type": "varchive-video"})
         return (2, res)
 
+    def __handleListRecent(self) -> List[Dict]:
+        recentList = self.recentManager.getRecentList()
+        recentList.sort(reverse=True)
+        res = []
+        for recent in recentList:
+            if self.isValidVarchiveVideoLink(self.recentPath + "/" + recent):
+                res.append({"filename": recent, "type": "varchive-video"})
+            else:
+                res.append({"filename": recent, "type": "invalid-varchive-video"})
+        return (2, res)
+
     def listDir(self, path: str) -> List[Dict]:
         realPath = self.FILE_MANAGER_ABS_PATH + "/" + path
         if realPath == self.AllPath:
             return self.__handleListAll()
-        if not os.path.exists(realPath):
-            return (-1, [])
-        if not os.path.isdir(realPath):
-            return (1, [])
-        if os.path.isdir(realPath) and self.isValidVarchiveVideo(realPath):
-            return (0, [])
-        res = []
-        files = sorted(os.listdir(realPath))
-        for file in files:
-            res.append(self.__classifyFile(realPath + "/" + file, file))
-        return (2, res)
+        elif realPath == self.recentPath:
+            return self.__handleListRecent()
+        else:
+            if not os.path.exists(realPath):
+                return (-1, [])
+            if not os.path.isdir(realPath):
+                return (1, [])
+            if os.path.isdir(realPath) and self.isValidVarchiveVideo(realPath):
+                return (0, [])
+            res = []
+            files = sorted(os.listdir(realPath))
+            for file in files:
+                res.append(self.__classifyFile(realPath + "/" + file, file))
+            return (2, res)
 
     @staticmethod
     def createDirIfnotExists(path: str):
