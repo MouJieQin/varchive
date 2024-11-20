@@ -3,7 +3,9 @@
         <router-link :to="{ name: this.getRouteName() }">
             <div class="image-container">
                 <img @mouseover="mouseOver" @mouseout="mouseOut" :src="clipImgSrc()" :alt="clip.cover">
-                <CollectionTag :id="`bookmark-icon-${videoPath}`" class="image-icon" @click.prevent="bookmarkClick" />
+                <CollectionTag v-show="isMouseOver || isMouseOverOnBookmarkIcon" :id="`bookmark-icon-${videoPath}`"
+                    class="image-icon" @mouseover="isMouseOverOnBookmarkIcon = true"
+                    @mouseout="isMouseOverOnBookmarkIcon = false" @click.prevent="bookmarkClick" />
             </div>
             <div class="cover-title">
                 <p>{{ videoInfo.title }}</p>
@@ -20,8 +22,14 @@ export default {
     data() {
         return {
             isMouseOver: false,
+            isMouseOverOnBookmarkIcon: false,
             bookmarks: {},
-            bookmarkClips: [],
+            bookmarkClips: [{
+                "webp": "/icons/landscape.png",
+                "cover": "/icons/landscape.png",
+                "startTime": 0,
+                "endTime": 0,
+            }],
             previewClips: [],
             isBookmarkLoad: false,
             isShowBookmark: false,
@@ -45,10 +53,6 @@ export default {
         getRouteName() {
             return this.routePath.slice(1, this.routePath.length)
         },
-        // async handleClick() {
-        //     const routeName = this.getRouteName()
-        //     await this.$router.push({ name: routeName })
-        // },
         getRealImagSrc(img) {
             return img.at(0) === '/' ? img : this.webpPath + "/" + img
         },
@@ -64,7 +68,7 @@ export default {
             }
             this.clip = this.clips[this.clipIndex]
             this.timer = setInterval(() => {
-                if (this.clipIndex >= this.clips.length) {
+                if (this.clipIndex >= this.clips.length - 1) {
                     this.clipIndex = 0
                 } else {
                     this.clipIndex += 1
