@@ -1,11 +1,13 @@
 <template>
     <div id="gallery" v-if="isShow">
-        <section class="gallery" :id="`gallery-${routeName}`">
-            <div v-for="video in varchiveVideos" :key="video">
-                <Cover :videoPath="videoInfos[video].videoPath" :videoInfo="videoInfos[video].videoInfo"
-                    :routePath="getRoutePath(video)" :webpPath="videoInfos[video].webpPath" :isPlay="false" />
-            </div>
-        </section>
+        <div :id="`gallery-${routeName}`">
+            <section class="gallery">
+                <div v-for="video in varchiveVideos" :key="video">
+                    <Cover :videoPath="videoInfos[video].videoPath" :videoInfo="videoInfos[video].videoInfo"
+                        :routePath="getRoutePath(video)" :webpPath="videoInfos[video].webpPath" :isPlay="false" />
+                </div>
+            </section>
+        </div>
         <el-backtop :bottom="20" />
     </div>
 </template>

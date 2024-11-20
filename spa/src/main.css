@@ -222,6 +222,10 @@ body {
     color: #d4d4d4;
 }
 
+.gallery {
+    padding-top: 30px;
+}
+
 .gallery .gallery-cover {
     float: left;
     width: 320px;
