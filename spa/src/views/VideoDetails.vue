@@ -304,7 +304,8 @@ export default {
 
     computed: {
         renameOption() {
-            return !this.currentPath.endsWith('.varchive')
+            return !this.currentPath.endsWith('.varchive') && !this.currentPath.startsWith('/video/Recent')
+            && !this.currentPath.startsWith('/video/All')
         },
         coverSrc() {
             if (typeof this.videoInfo === 'undefined' || typeof this.videoInfo.cover === 'undefined') {
