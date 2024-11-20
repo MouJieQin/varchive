@@ -121,7 +121,7 @@ class ResourceMapManager:
         self.metaPath = FILE_MANAGER_ABS_PATH + "/" + self.relMetaPath
         self.resourceMapPath = self.metaPath + "/resourceMap.json"
         self.archivePath = FILE_MANAGER_ABS_PATH + "/video/Varchive"
-        self.newPath = FILE_MANAGER_ABS_PATH + "/video/New"
+        self.AllPath = FILE_MANAGER_ABS_PATH + "/video/All"
         self.recentPath = FILE_MANAGER_ABS_PATH + "/video/Recent"
         self.recentURL = "http://{}:{}/video/Recent".format(
             self.Config["varchive"]["host"], self.Config["varchive"]["port"]
@@ -131,7 +131,7 @@ class ResourceMapManager:
         ResourceMapManager.symLinkIfnotExists(
             self.USER_HOME_PATH, f"{self.archivePath}/Home"
         )
-        ResourceMapManager.createDirIfnotExists(self.newPath)
+        ResourceMapManager.createDirIfnotExists(self.AllPath)
         ResourceMapManager.createDirIfnotExists(self.recentPath)
         self.recentManager = RecentManager(
             self.recentPath, self.recentURL, SystemRunner, maxHistory=100
@@ -153,8 +153,28 @@ class ResourceMapManager:
                 res["type"] = "directory"
         return res
 
+    def __createLinkDirToMetafile(self, linkPath: str, metaFilename: str):
+        if not self.isValidVarchiveVideoLink(linkPath):
+            ResourceMapManager.createDirIfnotExists(linkPath)
+            ResourceMapManager.createVarchiveLink(
+                self.getLinkPathByLinkDir(linkPath), metaFilename
+            )
+
+    def __handleListAll(self) -> List[Dict]:
+        metaFilenames = os.listdir(self.metaPath)
+        metaFilenames.sort(reverse=True)
+        res = []
+        for metaFilename in metaFilenames:
+            if self.isValidMetaPath(self.metaPath + "/" + metaFilename):
+                linkPath = self.AllPath + "/" + metaFilename
+                self.__createLinkDirToMetafile(linkPath, metaFilename)
+                res.append({"filename": metaFilename, "type": "varchive-video"})
+        return (2, res)
+
     def listDir(self, path: str) -> List[Dict]:
         realPath = self.FILE_MANAGER_ABS_PATH + "/" + path
+        if realPath == self.AllPath:
+            return self.__handleListAll()
         if not os.path.exists(realPath):
             return (-1, [])
         if not os.path.isdir(realPath):
@@ -415,7 +435,7 @@ class ResourceMapManager:
         formattedCurrTime = currTime.strftime("%Y-%m-%d_%H-%M-%S.%f")[:-3]
         newMetaPath = self.metaPath + "/" + formattedCurrTime
         if isNetworkResource:
-            linkPath = self.newPath + "/" + formattedCurrTime
+            linkPath = self.AllPath + "/" + formattedCurrTime
         print(newMetaPath, linkPath)
         ResourceMapManager.createDirIfnotExists(newMetaPath)
         ResourceMapManager.createDirIfnotExists(linkPath)
