@@ -25,6 +25,10 @@ from pathvalidate import is_valid_filename, sanitize_filename
 import asyncio
 import appdirs
 from send2trash import send2trash
+import signal
+import videoEditing.videoEditing as videoEditing
+import time
+
 
 CURR_FILE_ABS_PATH = os.path.abspath(__file__)
 SERVER_SRC_ABS_PATH = os.path.dirname(CURR_FILE_ABS_PATH)
@@ -272,7 +276,22 @@ async def parseSubtitle(request: Request, path: str = ""):
         return SubTitleParsed(subParseCode=-1, subParsedJsonStr=e)
 
 
+async def signal_handler(sig, frame):
+    print("Received quit signal. Exiting...")
+    videoEditing.PQueue.cancelAll()
+    await WebsocketManager.disconnectAll()
+    time.sleep(1)
+
+
+def handle_signal(sig, frame):
+    asyncio.ensure_future(signal_handler(sig, frame))
+
+
 if __name__ == "__main__":
+    # Register signal handler for SIGINT (Ctrl+C) and SIGTERM signals
+    signal.signal(signal.SIGINT, handle_signal)
+    signal.signal(signal.SIGTERM, handle_signal)
+
     uvicorn.run(
         app="varchive-server:app",
         host=HOST,

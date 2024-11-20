@@ -290,6 +290,13 @@ class WebSocketManager:
             )
         )
 
+    async def disconnectAll(self):
+        for id in range(0, self.maxConnection):
+            if self.isIinaConnected(id):
+                await self.disconnectIina(id)
+            if self.isVarchiveConnected(id):
+                self.disconnectVarchive(id)
+
     def isIinaConnected(self, ID: int):
         return self.activeIinaConnections[ID] is not None
 

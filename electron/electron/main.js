@@ -9,6 +9,7 @@ const varchivePath = splits.splice(0, splits.length - 2).join("/");
 const checkInstallPath = varchivePath.concat("/shell/varchive-checkInstall");
 const installPath = varchivePath.concat("/install");
 const startPath = varchivePath.concat("/shell/varchive-start");
+const stopPath = varchivePath.concat("/shell/varchive-stop");
 
 function runShellCommand(command) {
     return new Promise((resolve, reject) => {
