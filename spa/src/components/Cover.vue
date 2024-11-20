@@ -61,7 +61,17 @@ export default {
             clearInterval(this.timer)
             this.clip = this.videoInfo.cover
         },
-        mouseOver() {
+        async mouseOver() {
+            if (!this.isBookmarkLoad) {
+                const res = await this.loadBookmark()
+                if (res) {
+                    this.isShowBookmark = true
+                    this.clips = this.bookmarkClips
+                    this.clipIndex = 0
+                    document.getElementById('bookmark-icon-'.concat(this.videoPath)).style.color = '#F56C6C'
+                }
+            }
+
             this.isMouseOver = true
             if (this.clips.length === 0) {
                 return
@@ -85,7 +95,6 @@ export default {
         },
 
         async bookmarkClick() {
-            await this.loadBookmark()
             this.isShowBookmark = !this.isShowBookmark
             if (this.isShowBookmark) {
                 this.clips = this.bookmarkClips
@@ -99,14 +108,14 @@ export default {
         },
 
         async loadBookmark() {
-            if (this.isBookmarkLoad) {
-                return
-            }
             const res = await loadBookmarks(this.videoPath)
             this.isBookmarkLoad = true
             if (res.returnCode === 0) {
                 this.bookmarks = res.bookmarks
                 this.bookmarkClips = this.bookmarks.bookmarks.map((ele) => { return ele.clip })
+                return true
+            } else {
+                return false
             }
         }
     },
