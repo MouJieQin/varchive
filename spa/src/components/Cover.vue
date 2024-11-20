@@ -123,6 +123,9 @@ export default {
     created() {
         this.previewClips = [].concat(this.videoInfo.cover, this.videoInfo.previews.clips)
         this.clips = this.previewClips
+    },
+    beforeUnmount() {
+        clearInterval(this.timer)
     }
 
 }
