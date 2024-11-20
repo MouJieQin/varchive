@@ -46,7 +46,9 @@ class IINAinfoManager(IINAbookmarkManager):
                 "notification",
                 self.url,
                 "Already Archived",
-                "{} has been archived previously!".format(self.url),
+                "{} has been archived previously! A new cover will be generated.".format(
+                    self.url
+                ),
                 3,
             )
             await self.sendText(message)
@@ -60,7 +62,7 @@ class IINAinfoManager(IINAbookmarkManager):
             3,
         )
         await self.sendText(message)
-        self.ResourceMap.infoUsing[self.url] = self.infoJson
+        self.ResourceMap.infoUsing[self.detailsPath] = self.infoJson
 
     def __putDetailsMessageForVarchive(self):
         detailsInfo = {
@@ -82,13 +84,13 @@ class IINAinfoManager(IINAbookmarkManager):
                 "Acquiring network video resource duration, please wait.",
                 self.url,
             )
-            await self.sendText(message)
+            self.putMessageToBroadcastVarchives(message)
         videoDuration = videoEditor.getVideoDuration()
         if videoDuration <= 0:
             message = self.genNotificationMessageForVarchive(
                 "notification", "error", "Cannot acquire the video duration.", self.url
             )
-            await self.sendText(message)
+            self.putMessageToBroadcastVarchives(message)
             return -1
         if videoDuration <= self.duration:
             message = self.genNotificationMessageForVarchive(
@@ -97,7 +99,7 @@ class IINAinfoManager(IINAbookmarkManager):
                 "The video duration is too short to generate cover.",
                 "[{}s]: {}".format(videoDuration, self.url),
             )
-            await self.sendText(message)
+            self.putMessageToBroadcastVarchives(message)
             return -1
         if startTime + self.duration > videoDuration:
             startTime = videoDuration - self.duration
