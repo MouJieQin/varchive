@@ -154,15 +154,7 @@ class VideoEditing:
         """
         outputDir = os.path.dirname(outputPath)
         downloadSectionCmd, outputPathNoExt, videoPath = "", "", self.videoPath
-        if self.isNetworkResource:
-            downloadSectionCmd = self.yt_dlp_DownloadSectionCmd(
-                startTime, endTime, outputDir
-            )
-            outputPathNoExt = self.getYtdlpOutPathNoExt(startTime, endTime, outputDir)
-            videoPath = outputPathNoExt + "." + self.getNetworkResourceExt()  # ".*"
-            endTime = endTime - startTime
-            startTime = 0
-
+        # Directly generate by ffmpeg, which can be ineffecient to handle network resource, making it as a backup option
         args = [
             "ffmpeg",
             "-i",
@@ -187,13 +179,54 @@ class VideoEditing:
             self.genEscapeCharacter(outputPath),
         ]
         shellCmd = " ".join(args)
-        if self.isNetworkResource:
+
+        if not self.isNetworkResource:
+            print("#####shellCmd:", shellCmd)
+            return shellCmd
+        else:
+            downloadSectionCmd = self.yt_dlp_DownloadSectionCmd(
+                startTime, endTime, outputDir
+            )
+            outputPathNoExt = self.getYtdlpOutPathNoExt(startTime, endTime, outputDir)
+            videoPath = outputPathNoExt + "." + self.getNetworkResourceExt()  # ".*"
+            endTime = endTime - startTime
+            startTime = 0
+            # ffmpeg generate webp from an video segment downloaded by yt-dlp when handling network resource.
+            args = [
+                "ffmpeg",
+                "-i",
+                self.genEscapeCharacter(videoPath),
+                "-ss",
+                str(startTime),
+                "-to",
+                str(endTime),
+                "-y",
+                "-v",
+                "warning",
+                "-threads",
+                str(Num_cores - 1),
+                "-loop",
+                str(loop),
+                "-vf",
+                "fps=" + str(fps) + ",scale=" + scale,
+                "-compression_level",
+                str(compression_level),
+                "-q:v",
+                str(quality),
+                self.genEscapeCharacter(outputPath),
+            ]
+            Cmd = " ".join(args)
+
             shellCmd = (
-                downloadSectionCmd
+                "("
+                + downloadSectionCmd
                 + " && "
-                + shellCmd
+                + Cmd
                 + " && rm -f "
                 + self.genEscapeCharacter(videoPath)
+                + ") || ("
+                + shellCmd
+                + ")"
             )
-        print("#####shellCmd:", shellCmd)
-        return shellCmd
+            print("#####shellCmd:", shellCmd)
+            return shellCmd
