@@ -24,6 +24,7 @@ from pathlib import Path
 from pathvalidate import is_valid_filename, sanitize_filename
 import asyncio
 import appdirs
+from send2trash import send2trash
 
 CURR_FILE_ABS_PATH = os.path.abspath(__file__)
 SERVER_SRC_ABS_PATH = os.path.dirname(CURR_FILE_ABS_PATH)
@@ -225,16 +226,34 @@ async def fetchJson(request: Request, path: str = ""):
     return FetchJson(jsonStr=json.dumps(fJson))
 
 
-@app.get("/filemanager/open", response_model=FetchJson)
-async def openFileOnFinder(request: Request, path: str = ""):
-    path = FILE_MANAGER_ABS_PATH + "/" + path
+class PathManage(BaseModel):
+    path: str = ""
+    command: str = ""
+
+
+@app.post("/filemanager/varchive/file/")
+async def renameVarchiveLinkDir(request: Request, pm: PathManage):
+    path = FILE_MANAGER_ABS_PATH + "/" + pm.path
     if not os.path.exists(path):
         raise HTTPException(status_code=400, detail="Not a file or does not exist")
-    command = ["open", "-R", path]
-    SystemRunner.put(command)
-    command = ["osascript", "-e", 'tell application "Finder" to activate']
-    SystemRunner.put(command)
-    return {"statue": "running"}
+    if pm.command == "openInFinder":
+        command = ["open", "-R", path]
+        SystemRunner.put(command)
+        command = ["osascript", "-e", 'tell application "Finder" to activate']
+        SystemRunner.put(command)
+        return {"statue": "running"}
+    elif pm.command == "moveToTrash":
+        if ResourceMap.isVarchiveLinkDir(path):
+            send2trash(path)
+            return {"statue": "running"}
+        else:
+            raise HTTPException(
+                status_code=400, detail="Cannot operate non-varchive file."
+            )
+    else:
+        raise HTTPException(
+            status_code=400, detail=f"Invalide file command:{pm.command}"
+        )
 
 
 # subtitle

@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, screen } = require("electron");
 const path = require("path");
 const { exec } = require("child_process");
 const { dialog } = require("electron");
@@ -94,9 +94,10 @@ async function startServer() {
 const NODE_ENV = process.env.NODE_ENV;
 
 function createWindow() {
+    const { width, height } = screen.getPrimaryDisplay().workAreaSize;
     const mainWindow = new BrowserWindow({
-        width: 1000,
-        height: 800,
+        width: width,
+        height: height,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
         },

@@ -301,7 +301,7 @@ class ResourceMapManager:
 
     @staticmethod
     def isVarchiveLinkDir(path: str) -> bool:
-        return os.path.isfile(path + "/link-varchive.json")
+        return os.path.isfile(ResourceMapManager.getLinkPathByLinkDir(path))
 
     def parseURL(self, url: str) -> List:
         headerLength = len(self.localFileHeader)

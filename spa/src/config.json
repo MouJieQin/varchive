@@ -7,10 +7,10 @@
         "subtitleParse": "/subtitle/parser",
         "filemanager": "/filemanager",
         "fetchJson": "/filemanager/json",
-        "fileDownload": "/filemanager/download",
-        "openFile": "/filemanager/open"
+        "fileDownload": "/filemanager/download"
     },
     "post": {
+        "fileOperation": "/filemanager/varchive/file/",
         "deleteVarchive": "/filemanager/varchive/delete/",
         "renameVarchive": "/filemanager/varchive/rename/"
     }

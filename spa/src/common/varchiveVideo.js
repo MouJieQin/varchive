@@ -1,4 +1,37 @@
 import config from "@/config.json";
+import { ElMessage, ElNotification, ElMessageBox } from "element-plus";
+
+export const fileOperate = async (path, command) => {
+    const url = config.server.concat(config.post.fileOperation);
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                path: path,
+                command: command,
+            }),
+        });
+        if (!response.ok) {
+            const message = await response.json();
+            ElMessage({
+                message: message.detail,
+                type: "error",
+            });
+            return;
+        }
+        ElMessage({
+            message: command + "!",
+            type: "success",
+        });
+    } catch (error) {
+        console.log("Request Failed:", error);
+        return;
+    }
+};
+
 export const loadVideoInfo = async (path) => {
     const splits = path.split("/");
     const currentPath = splits.slice(0, splits.length - 1).join("/");

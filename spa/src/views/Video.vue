@@ -43,9 +43,10 @@ export default {
         async checkKeyDown(event) {
             if (event.key === 'f') {
                 if (this.mouseOverRouterLink != "") {
-                    await this.openFile(this.mouseOverRouterLink)
+                    await fileOperate(this.mouseOverRouterLink, "openInFinder")
                 }
-            } else if (event.key === 'Meta') {
+            }
+            else if (event.key === 'Meta') {
                 this.isMetaKeyDown = true
             }
         },
@@ -75,17 +76,6 @@ export default {
             await this.$router.replace({ name: parent })
             await this.$router.push({ name: targetFolder })
         },
-        async openFile(path) {
-            const url = config.server.concat(config.get.openFile, "?path=", path)
-            try {
-                const response = await fetch(url)
-                // const resJson = await response.json()
-            } catch (error) {
-                console.log('Request Failed:', error);
-                return
-            }
-        },
-
         async checkSignal() {
             if (this.$router.hasRoute(this.currFolder)) {
                 await this.$router.push({ name: this.currFolder })

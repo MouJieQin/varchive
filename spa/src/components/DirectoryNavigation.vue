@@ -17,6 +17,8 @@
 import { onBeforeRouteLeave } from 'vue-router'
 import config from '@/config.json'
 import Covers from '@/views/Covers.vue'
+import { fileOperate } from '@/common/varchiveVideo.js'
+
 export default {
     data() {
         return {
@@ -38,7 +40,11 @@ export default {
         async checkKeyDown(event) {
             if (event.key === 'f') {
                 if (this.mouseOverRouterLink != "") {
-                    await this.openFile(this.mouseOverRouterLink)
+                    await fileOperate(this.mouseOverRouterLink, "openInFinder")
+                }
+            } else if (event.key === 'Backspace') {
+                if (this.mouseOverRouterLink != "") {
+                    await fileOperate(this.mouseOverRouterLink, "moveToTrash")
                 }
             } else if (event.key === 'Meta') {
                 this.isMetaKeyDown = true
@@ -69,16 +75,6 @@ export default {
             }
             await this.$router.replace({ name: parent })
             await this.$router.push({ name: targetFolder })
-        },
-        async openFile(path) {
-            const url = config.server.concat(config.get.openFile, "?path=", path)
-            try {
-                const response = await fetch(url)
-                // const resJson = await response.json()
-            } catch (error) {
-                console.log('Request Failed:', error);
-                return
-            }
         },
         async initData(currRouterName) {
             const url = config.server.concat(config.get.filemanager, "?path=", currRouterName)
@@ -124,14 +120,6 @@ export default {
                     }
                 )
             }
-            // this.$router.addRoute(currRouterName,
-            //     {
-            //         path: "covers",
-            //         name: currRouterName.concat("/covers"),
-            //         component: () => import('@/views/Covers.vue'),
-            //         props: route => ({ ...route.params })
-            //     }
-            // )
         },
     },
     async created() {
