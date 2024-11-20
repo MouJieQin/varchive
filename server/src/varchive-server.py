@@ -31,8 +31,8 @@ APP_SUPPORT_PATH = app_support_path = appdirs.user_data_dir()[0:-1]
 VARCHIVE_SUPPORT_PATH = f"{APP_SUPPORT_PATH}/varchive"
 CONFIG_FILE = SERVER_SRC_ABS_PATH + "/config.json"
 FILE_MANAGER_ABS_PATH = VARCHIVE_SUPPORT_PATH + "/fileManager"
-SSL_KEY_FILE = os.path.abspath(SERVER_SRC_ABS_PATH + "/../pem/server.key")
-SSL_CERT_FILE = os.path.abspath(SERVER_SRC_ABS_PATH + "/../pem/server.crt")
+SSL_KEY_FILE = FILE_MANAGER_ABS_PATH + "/pem/server.key"
+SSL_CERT_FILE = FILE_MANAGER_ABS_PATH + "/pem/server.crt"
 USER_HOME_PATH = os.path.expanduser("~")
 
 Config = {}

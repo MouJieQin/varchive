@@ -1,11 +1,32 @@
 #!/bin/bash --login
 
+SCRIPT_DIR=$(
+    cd $(dirname "$0")
+    pwd
+)
+if [ -z "$HOME" ]; then
+    export HOME="/Users/$(whoami)"
+fi
+
+APP_PATH="$HOME/Library/Application Support/varchive"
+PEM_PATH="$APP_PATH/fileManager/pem"
+mkdir -p "$PEM_PATH"
+cp "$SCRIPT_DIR/genCA" "$PEM_PATH/"
+cp "$SCRIPT_DIR/v3.ext" "$PEM_PATH/"
 #Generate root certificate
+cd "$PEM_PATH"
+if [ -f rootCA.der ]; then
+    if security find-certificate -Z -a | grep -i "$(shasum -a 1 rootCA.der|cut -d ' ' -f 1 )"; then
+        exit 0
+    fi
+fi
 openssl genrsa -out rootCA.key 2048
 openssl req -x509 -new -nodes -key rootCA.key -sha256 -days 3650 -out rootCA.pem -subj "/C=CN/ST=Province/L=City/O=Varchive/OU=Varchive/CN=Varchive Root CA"
 openssl req -new -sha256 -nodes -out server.csr -newkey rsa:2048 -keyout server.key -subj "/C=CN/ST=Province/L=City/O=Varchive/OU=Varchive/CN=Varchive Root CA"
 openssl x509 -req -in server.csr -CA rootCA.pem -CAkey rootCA.key -CAcreateserial -out server.crt -days 500 -sha256 -extfile v3.ext
+openssl x509 -outform der -in rootCA.pem -out rootCA.der
 if ! sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain rootCA.pem; then
     exit 1
 fi
+cd -
 exit 0

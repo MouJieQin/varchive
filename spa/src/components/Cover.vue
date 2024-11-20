@@ -78,6 +78,10 @@ export default {
             }
             this.clip = this.clips[this.clipIndex]
             this.timer = setInterval(() => {
+                if (!this.isMouseOver) {
+                    clearInterval(this.timer)
+                    return
+                }
                 if (this.clipIndex >= this.clips.length - 1) {
                     this.clipIndex = 0
                 } else {

@@ -50,7 +50,6 @@ installNpmIfNotExist() {
 }
 
 main() {
-
     if ! which 'brew'; then
         if ! /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"; then
             echo "Error: Cannot install brew" 1>&2
@@ -58,7 +57,8 @@ main() {
         fi
     fi
 
-    installNpmIfNotExist
+    # installNpmIfNotExist
+    installIfNotExist "node"
     installIfNotExist "ffmpeg"
     installIfNotExist "yt-dlp"
 
@@ -89,19 +89,6 @@ main() {
         handleExit 1
     fi
     cd -
-
-    if ! osascript -e 'tell application "System Events" to get the name of every login item' | grep varchive-start; then
-        # Ask the user for input
-        read -p "Do you want to add the varchive-start to your 「Login items」? ([yes]/no):" response
-        # Check the user's response
-        if [ -z "$response" ] || [[ "$response" == "yes" || "$response" == "YES" ]]; then
-            osascript -e "tell application \"System Events\" to make new login item at end with properties {path:\"$VARCHIVE_PATH/shell/varchive-start\", hidden:false}"
-        elif [[ "$response" == "no" || "$response" == "NO" ]]; then
-            echo
-        else
-            echo
-        fi
-    fi
 
     echo
     echo
