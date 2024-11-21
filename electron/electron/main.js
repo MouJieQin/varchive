@@ -23,6 +23,48 @@ function runShellCommand(command) {
     });
 }
 
+async function curl(path, jsonStr) {
+    const url = "https://127.0.0.1:8999".concat(path);
+    const curlCmd = "".concat(
+        "curl -X POST ",
+        url,
+        ' -H "Content-Type: application/json" -d ',
+        "'",
+        jsonStr,
+        "'"
+    );
+    console.log("curlCmd:", curlCmd);
+    return await runShellCommand(curlCmd)
+        .then((stdout) => {
+            console.log("curl: ", stdout);
+            return {
+                returnCode: 0,
+                stdout: stdout,
+            };
+            return stdout;
+        })
+        .catch(async ({ error, stderr }) => {
+            const options = {
+                type: "error",
+                message: `${installPath}`,
+                detail: `${stderr}`,
+                buttons: ["OK"],
+            };
+            await dialog.showMessageBox(options);
+            return { returnCode: 1 };
+        });
+}
+
+async function serverOperate(command) {
+    const response = await curl(
+        "/varchive/server/",
+        JSON.stringify({
+            command: command,
+        })
+    );
+    return response;
+}
+
 async function install() {
     const installCmd = "open ".concat(
         installPath,
@@ -110,11 +152,20 @@ function createWindow() {
     }
 }
 
+async function handleShutdown() {
+    const res = await serverOperate(["shutdown", "default"]);
+}
+
+async function cancelShutdown() {
+    const res = await serverOperate(["shutdown", "cancel"]);
+}
+
 app.whenReady().then(async () => {
     const res = await checkInstall();
     if (res !== 0) {
         app.quit();
     } else {
+        await cancelShutdown();
         await startServer();
         createWindow();
         app.on("activate", function () {
@@ -125,7 +176,11 @@ app.whenReady().then(async () => {
     }
 });
 
-app.on("window-all-closed", function () {
+app.on("before-quit", async (event) => {
+    await handleShutdown();
+});
+
+app.on("window-all-closed", async () => {
     if (process.platform !== "darwin") {
         app.quit();
     }
