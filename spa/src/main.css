@@ -234,6 +234,22 @@ body {
     padding-top: 30px;
 }
 
+.infinite-list {
+    height: 500px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.infinite-list .infinite-list-item {
+    align-items: center;
+    justify-content: center;
+}
+
+.infinite-list .infinite-list-item + .list-item {
+    margin-top: 10px;
+}
+
 .gallery .gallery-cover {
     float: left;
     width: 320px;

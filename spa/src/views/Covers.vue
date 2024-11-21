@@ -2,10 +2,13 @@
     <div id="gallery" v-if="isShow">
         <div :id="`gallery-${routeName}`">
             <section class="gallery">
-                <div v-for="video in varchiveVideos" :key="video">
-                    <Cover :videoPath="videoInfos[video].videoPath" :videoInfo="videoInfos[video].videoInfo"
-                        :routePath="getRoutePath(video)" :webpPath="videoInfos[video].webpPath" :isPlay="false" />
-                </div>
+                <p>Totoal:{{ varchiveVideos.length }}</p>
+                <ul v-infinite-scroll="load" class="infinite-list" style="overflow:visible">
+                    <li v-for="video in varchiveVideosShowing" :key="video" class="infinite-list-item">
+                        <Cover :videoPath="videoInfos[video].videoPath" :videoInfo="videoInfos[video].videoInfo"
+                            :routePath="getRoutePath(video)" :webpPath="videoInfos[video].webpPath" :isPlay="false" />
+                    </li>
+                </ul>
             </section>
         </div>
         <el-backtop :bottom="20" />
@@ -19,6 +22,7 @@ import Cover from '@/components/Cover.vue'
 export default {
     data() {
         return {
+            varchiveVideosShowing: [],
             varchiveVideos: [],
             videoInfos: {},
             timer: {},
@@ -42,6 +46,14 @@ export default {
         }
     },
     methods: {
+        load() {
+            if (this.varchiveVideos.length) {
+                var count = 30
+                for (var i = this.varchiveVideosShowing.length, len = this.varchiveVideos.length; i < len && count > 0; --count, ++i) {
+                    this.varchiveVideosShowing.push(this.varchiveVideos[i])
+                }
+            }
+        },
         initData() {
             this.varchiveVideos = []
             if (this.fileStatusCode === 2) {
@@ -80,15 +92,19 @@ export default {
         }
     },
     created() {
+        var count = 0
         this.timer = setInterval(() => {
             if (!this.isShow) {
                 clearInterval(this.timer)
             } else {
                 if (this.goToGallery()) {
-                    clearInterval(this.timer)
+                    count += 1
+                    if (count == 3) {
+                        clearInterval(this.timer)
+                    }
                 }
             }
-        }, 300)
+        }, 500)
     },
     beforeUnmount() {
         clearInterval(this.timer)
