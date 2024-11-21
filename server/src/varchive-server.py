@@ -36,24 +36,54 @@ VARCHIVE_CODE_PATH = os.path.abspath(SERVER_SRC_ABS_PATH + "/../../")
 SHELL_PATH = f"{VARCHIVE_CODE_PATH}/shell"
 APP_SUPPORT_PATH = app_support_path = appdirs.user_data_dir()[0:-1]
 VARCHIVE_SUPPORT_PATH = f"{APP_SUPPORT_PATH}/varchive"
-CONFIG_FILE = SERVER_SRC_ABS_PATH + "/config.json"
 FILE_MANAGER_ABS_PATH = VARCHIVE_SUPPORT_PATH + "/fileManager"
+USER_CONFIG_DIR = FILE_MANAGER_ABS_PATH + "/config"
+CONFIG_FILE = USER_CONFIG_DIR + "/config.json"
+DEFAULT_CONFIG_FILE = SERVER_SRC_ABS_PATH + "/config.json"
 SSL_KEY_FILE = FILE_MANAGER_ABS_PATH + "/pem/server.key"
 SSL_CERT_FILE = FILE_MANAGER_ABS_PATH + "/pem/server.crt"
 USER_HOME_PATH = os.path.expanduser("~")
 
+# config
 Config = {}
+DefaultConfig = {}
 
-with open(CONFIG_FILE, mode="r", encoding="utf-8") as f:
-    Config = json.load(f)
-HOST = Config["server"]["host"]
-PORT = Config["server"]["port"]
 
+def createDirIfnotExists(path: str):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
+createDirIfnotExists(USER_CONFIG_DIR)
+
+with open(DEFAULT_CONFIG_FILE, mode="r", encoding="utf-8") as f:
+    DefaultConfig = json.load(f)
+
+if os.path.isfile(CONFIG_FILE):
+    with open(CONFIG_FILE, mode="r", encoding="utf-8") as f:
+        Config = json.load(f)
+
+
+def setDefaultValIfNone(config: dict, defaultConfig: dict):
+    for its in defaultConfig.items():
+        if its[0] not in config:
+            config[its[0]] = its[1]
+        else:
+            if isinstance(its[1], dict):
+                setDefaultValIfNone(config[its[0]], its[1])
+
+setDefaultValIfNone(Config, DefaultConfig)
 
 def syncConfig():
     with open(CONFIG_FILE, mode="w", encoding="utf-8") as f:
         f.write(json.dumps(Config, ensure_ascii=False, indent=4))
 
+syncConfig()
+
+
+
+HOST = Config["server"]["host"]
+PORT = Config["server"]["port"]
 
 SystemRunner = systemRun.SystemRun()
 ResourceMap = resourceMap.ResourceMapManager(
