@@ -32,6 +32,8 @@ import time
 
 CURR_FILE_ABS_PATH = os.path.abspath(__file__)
 SERVER_SRC_ABS_PATH = os.path.dirname(CURR_FILE_ABS_PATH)
+VARCHIVE_CODE_PATH = os.path.abspath(SERVER_SRC_ABS_PATH + "/../../")
+SHELL_PATH = f"{VARCHIVE_CODE_PATH}/shell"
 APP_SUPPORT_PATH = app_support_path = appdirs.user_data_dir()[0:-1]
 VARCHIVE_SUPPORT_PATH = f"{APP_SUPPORT_PATH}/varchive"
 CONFIG_FILE = SERVER_SRC_ABS_PATH + "/config.json"
@@ -257,6 +259,41 @@ async def renameVarchiveLinkDir(request: Request, pm: PathManage):
     else:
         raise HTTPException(
             status_code=400, detail=f"Invalide file command:{pm.command}"
+        )
+
+
+class ServerManage(BaseModel):
+    command: List[str] = []
+
+
+@app.post("/varchive/server/")
+async def serverOperate(request: Request, sm: ServerManage):
+    if sm.command[0] == "info":
+        return {
+            "tasks": videoEditing.PQueue.size(),
+            "iinaConnections": WebsocketManager.getIinaConnections(),
+            "varchiveConnections": WebsocketManager.getVarchiveConnections(),
+        }
+    elif sm.command[0] == "shutdown":
+        if sm.command[1] == "instant":
+            command = [f"{SHELL_PATH}/varchive-stop"]
+            SystemRunner.put(command)
+            return {"statue": "Shutdown"}
+        elif sm.command[1] == "Cancel":
+            videoEditing.PQueue.cancel("shutdown")
+            return {"statue": "Canceled"}
+        else:
+            # shutdown after tasks in PQueue are done
+            def callBack(TaskStatus):
+                pass
+
+            videoEditing.PQueue.put(
+                "shutdown", f"{SHELL_PATH}/varchive-stop", callBack
+            )
+            return {"statue": "Shutdown after tasks are done."}
+    else:
+        raise HTTPException(
+            status_code=400, detail=f"Invalide file command:{sm.command}"
         )
 
 

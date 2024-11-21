@@ -261,6 +261,20 @@ class WebSocketManager:
         if len(self.VideoStatisticUsing[statisticsPath]) == 1:
             self.VideoStatisticUsing.pop(statisticsPath)
 
+    def getIinaConnections(self) -> int:
+        count = 0
+        for id in range(0, self.maxConnection):
+            if self.isIinaConnected(id):
+                count += 1
+        return count
+
+    def getVarchiveConnections(self) -> int:
+        count = 0
+        for id in range(0, self.maxConnection):
+            if self.isVarchiveConnected(id):
+                count += 1
+        return count
+
     async def disconnectIina(self, ID: int):
         await self.updateVideoStatisticsWhenDisconnnect(ID, self.iinaVIconnectInfo[ID])
         self.activeIinaConnections[ID] = None

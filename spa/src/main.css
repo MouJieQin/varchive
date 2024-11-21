@@ -33,6 +33,14 @@
     opacity: 0.9;
 }
 
+#navigation p {
+    opacity: 0.7;
+}
+
+#navigation p:hover {
+    opacity: 0.9;
+}
+
 #logo {
     padding-top: 7px;
     padding-left: 2%;

@@ -10,6 +10,7 @@
         "fileDownload": "/filemanager/download"
     },
     "post": {
+        "varchiveServer": "/varchive/server/",
         "fileOperation": "/filemanager/varchive/file/",
         "deleteVarchive": "/filemanager/varchive/delete/",
         "renameVarchive": "/filemanager/varchive/rename/"

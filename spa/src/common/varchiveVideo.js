@@ -1,6 +1,34 @@
 import config from "@/config.json";
 import { ElMessage, ElNotification, ElMessageBox } from "element-plus";
 
+export const serverOperate = async (command) => {
+    const url = config.server.concat(config.post.varchiveServer);
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                command: command,
+            }),
+        });
+        if (response.ok) {
+            return { returnCode: 0, json: await response.json() };
+        } else {
+            const message = await response.json();
+            ElMessageBox.alert(message.detail, "Error", {
+                confirmButtonText: "OK",
+                type: "error",
+            });
+            return { returnCode: 1 };
+        }
+    } catch (error) {
+        console.log("Request Failed:", error);
+        return { returnCode: 1 };
+    }
+};
+
 export const fileOperate = async (path, command) => {
     const url = config.server.concat(config.post.fileOperation);
     try {
