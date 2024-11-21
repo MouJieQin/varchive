@@ -4,10 +4,10 @@ echo "Moving files to resource..."
 # Get the directory of the script
 SCRIPT_DIR=$(dirname "$0")
 VARCHIVE_DIR=$(
-    cd "$SCRIPT_DIR/../../.."
+    cd "$SCRIPT_DIR/../.."
     pwd
 )
-RESOURCE_DIR="$VARCHIVE_DIR/electron/Varchive/dist_electron/mac/Varchive.app/Contents/Resources"
+RESOURCE_DIR="$VARCHIVE_DIR/electron/dist_electron/mac/Varchive.app/Contents/Resources"
 if [ ! -d "$RESOURCE_DIR" ]; then
     echo "Not exist: $RESOURCE_DIR" 1>&2
     exit 1

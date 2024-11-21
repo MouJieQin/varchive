@@ -305,7 +305,7 @@ export default {
     computed: {
         renameOption() {
             return !this.currentPath.endsWith('.varchive') && !this.currentPath.startsWith('/video/Recent')
-            && !this.currentPath.startsWith('/video/All')
+                && !this.currentPath.startsWith('/video/All')
         },
         coverSrc() {
             if (typeof this.videoInfo === 'undefined' || typeof this.videoInfo.cover === 'undefined') {
@@ -752,7 +752,7 @@ export default {
             }
             this.webSocket.onopen = async (event) => {
                 this.connection = "serverConnected"
-                this.showElNotification('Success', 'Connected with server.', 'success')
+                // this.showElNotification('Success', 'Connected with server.', 'success')
                 await this.fetchInfo()
             }
             this.webSocket.onmessage = (event) => {
@@ -761,8 +761,10 @@ export default {
             }
             this.webSocket.onclose = (event) => {
                 this.connection = "closed"
-                this.showElNotification('Warning', 'Cannot connect to server. Retrying ...', 'warning')
-                this.retryWebsocketConnection()
+                if (!this.isBeforeUnmount) {
+                    this.showElNotification('Warning', 'Cannot connect to server. Retrying ...', 'warning')
+                    this.retryWebsocketConnection()
+                }
             }
         },
         async sendMessage(message) {

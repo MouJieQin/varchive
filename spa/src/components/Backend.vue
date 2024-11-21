@@ -1,16 +1,19 @@
 <template>
-    <el-dialog v-model="isDialogVisible" title="Shipping address" width="500">
+    <el-dialog v-model="isDialogVisible" title="Backend" width="500">
         <p>Tasks: {{ tasks }}</p>
-        <p>IINA connections: {{ iinaConnections }}</p>
+        <p>IINA connections: {{ iinaConnections }} </p>
         <p>Varchive connections: {{ varchiveConnections }}</p>
+        <p>Is shutdown in tasks: {{ isShutdownInTasks }}</p>
         <el-switch v-model="shutdownInstantChecked" class="mb-2"
-            style="--el-switch-on-color: #ff4949; --el-switch-off-color: #13ce66" active-text="Shutdown instantly"
+            style="--el-switch-on-color: #ff4949; --el-switch-off-color: #13ce66" active-text="Shutdown now"
             inactive-text="Shutdown after tasks are done" />
         <template #footer>
             <div class="dialog-footer">
+                <el-button v-if="tasks !== 0" @click="cancelAllTasks">Cancel All Tasks</el-button>
+                <el-button v-if="isShutdownInTasks" type="primary" @click="cancelShutdown">Cancel Shutdown</el-button>
                 <el-button @click="isDialogVisible = false">Cancel</el-button>
-                <el-button v-loading.fullscreen.lock="fullscreenLoading" type="primary" @click="handleExit">
-                    Exit
+                <el-button v-loading.fullscreen.lock="fullscreenLoading" type="danger" @click="handleShutdown">
+                    ShutDown
                 </el-button>
             </div>
         </template>
@@ -19,7 +22,7 @@
 
 <script>
 import { serverOperate } from '@/common/varchiveVideo.js'
-import { ElSwitch } from "element-plus";
+import { ElSwitch, ElMessage } from "element-plus";
 
 
 export default {
@@ -30,6 +33,7 @@ export default {
             tasks: 0,
             iinaConnections: 0,
             varchiveConnections: 0,
+            isShutdownInTasks: false,
             updateTimer: {},
             fullscreenLoading: false,
         }
@@ -67,18 +71,43 @@ export default {
         refreshWindow() {
             window.location.reload();
         },
-        async handleExit() {
-            this.openFullScreen()
+        async handleShutdown() {
             if (this.shutdownInstantChecked) {
+                this.openFullScreen()
                 const res = await serverOperate(["shutdown", "instant"])
                 if (res.returnCode !== 0) {
                     return
                 }
             } else {
+                if (this.tasks === 0) {
+                    this.openFullScreen()
+                }
                 const res = await serverOperate(["shutdown", "default"])
                 if (res.returnCode !== 0) {
                     return
                 }
+            }
+        },
+        async cancelAllTasks() {
+            const res = await serverOperate(["task", "cancelAll"])
+            if (res.returnCode === 0) {
+                return
+            } else {
+                ElMessage({
+                    message: "Cancel failed!",
+                    type: "error",
+                });
+            }
+        },
+        async cancelShutdown() {
+            const res = await serverOperate(["shutdown", "cancel"])
+            if (res.returnCode === 0) {
+                return
+            } else {
+                ElMessage({
+                    message: "Cancel failed!",
+                    type: "error",
+                });
             }
         },
         async updateServerInfo() {
@@ -90,6 +119,7 @@ export default {
             this.tasks = serverInfo.tasks
             this.iinaConnections = serverInfo.iinaConnections
             this.varchiveConnections = serverInfo.varchiveConnections
+            this.isShutdownInTasks = serverInfo.isShutdownInTasks
         },
     }
 }

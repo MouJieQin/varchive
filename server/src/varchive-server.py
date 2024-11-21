@@ -273,13 +273,14 @@ async def serverOperate(request: Request, sm: ServerManage):
             "tasks": videoEditing.PQueue.size(),
             "iinaConnections": WebsocketManager.getIinaConnections(),
             "varchiveConnections": WebsocketManager.getVarchiveConnections(),
+            "isShutdownInTasks": videoEditing.PQueue.hasKey("shutdown"),
         }
     elif sm.command[0] == "shutdown":
         if sm.command[1] == "instant":
             command = [f"{SHELL_PATH}/varchive-stop"]
             SystemRunner.put(command)
             return {"statue": "Shutdown"}
-        elif sm.command[1] == "Cancel":
+        elif sm.command[1] == "cancel":
             videoEditing.PQueue.cancel("shutdown")
             return {"statue": "Canceled"}
         else:
@@ -287,10 +288,11 @@ async def serverOperate(request: Request, sm: ServerManage):
             def callBack(TaskStatus):
                 pass
 
-            videoEditing.PQueue.put(
-                "shutdown", f"{SHELL_PATH}/varchive-stop", callBack
-            )
+            videoEditing.PQueue.put("shutdown", f"{SHELL_PATH}/varchive-stop", callBack)
             return {"statue": "Shutdown after tasks are done."}
+    elif sm.command[0] == "task":
+        if sm.command[1] == "cancelAll":
+            videoEditing.PQueue.cancelAll()
     else:
         raise HTTPException(
             status_code=400, detail=f"Invalide file command:{sm.command}"
