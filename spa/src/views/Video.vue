@@ -127,7 +127,6 @@ export default {
                     }
                 )
             }
-            console.log("this.dirs:", this.dirs)
             return 0
         },
     },
@@ -140,9 +139,7 @@ export default {
         const currPath = this.path
         if (typeof (this.path) != 'undefined') {
             for (var i = 0, len = currPath.length; i < len; ++i) {
-                console.log("typeof(currPath):", typeof (currPath), currPath)
                 this.currFolder = this.currFolder.concat('/', currPath[i])
-                console.log("this.currFolder:", this.currFolder)
                 try {
                     await new Promise((resolve) => {
                         let timer = setInterval(() => {
@@ -155,7 +152,6 @@ export default {
                     })
 
                     if (typeof (res) != 'void') {
-                        console.log("this.$router.push res:", res)
                         // window.location.href = '/NotFound'
                     }
                 } catch (error) {

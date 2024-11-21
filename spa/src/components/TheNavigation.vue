@@ -4,8 +4,8 @@
             <Logo />
         </router-link>
         <router-link :to="{ name: 'video' }">Video</router-link>
-        <router-link>
-            <p @click.prevent="shutdownDialogVisible = true">Backend</p>
+        <router-link :to="{ name: 'video' }">
+            <p @click.prevent=" shutdownDialogVisible = true">Backend</p>
         </router-link>
         <!-- <router-link :to="{ name: 'help' }">Help</router-link> -->
     </div>

@@ -72,14 +72,16 @@ def setDefaultValIfNone(config: dict, defaultConfig: dict):
             if isinstance(its[1], dict):
                 setDefaultValIfNone(config[its[0]], its[1])
 
+
 setDefaultValIfNone(Config, DefaultConfig)
+
 
 def syncConfig():
     with open(CONFIG_FILE, mode="w", encoding="utf-8") as f:
         f.write(json.dumps(Config, ensure_ascii=False, indent=4))
 
-syncConfig()
 
+syncConfig()
 
 
 HOST = Config["server"]["host"]

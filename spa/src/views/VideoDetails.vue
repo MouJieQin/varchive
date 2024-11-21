@@ -74,7 +74,7 @@
                             <el-icon v-show="isPlayPreview" class="icon" style="margin-left: 15px">
                                 <VideoPause @click="isPlayPreview = false" />
                             </el-icon>
-                            <el-popconfirm confirm-button-text="Delete" cancel-button-text="No" :icon="WarningFilled"
+                            <el-popconfirm confirm-button-text="Delete" cancel-button-text="No" :icon="WarningFilledRaw"
                                 icon-color="#E6A23C" title="Delete all clips?" @confirm="deletePreviews" @cancel="">
                                 <template #reference>
                                     <el-icon class="icon" style="margin-left: 15px">
@@ -212,6 +212,7 @@ import { markRaw } from 'vue'
 export default {
     data() {
         return {
+            WarningFilledRaw: markRaw(WarningFilled),
             currentPath: "",
             connection: "closed",
             isInfoEditing: false,
