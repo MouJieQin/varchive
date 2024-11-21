@@ -1,18 +1,28 @@
 <template>
     <el-dialog v-model="isDialogVisible" title="Backend" width="500">
-        <p>Tasks: {{ tasks }}</p>
-        <p>IINA connections: {{ iinaConnections }} </p>
-        <p>Varchive connections: {{ varchiveConnections }}</p>
-        <p>Is shutdown in tasks: {{ isShutdownInTasks }}</p>
-        <el-switch v-model="shutdownInstantChecked" class="mb-2"
-            style="--el-switch-on-color: #ff4949; --el-switch-off-color: #13ce66" active-text="Shutdown now"
-            inactive-text="Shutdown after tasks are done" />
-        <template #footer>
+        <div v-if="isConnectServer">
+            <p>Tasks: {{ tasks }}</p>
+            <p>IINA connections: {{ iinaConnections }} </p>
+            <p>Varchive connections: {{ varchiveConnections }}</p>
+            <p>Is shutdown in tasks: {{ isShutdownInTasks }}</p>
+            <el-switch v-model="shutdownInstantChecked" class="mb-2"
+                style="--el-switch-on-color: #ff4949; --el-switch-off-color: #13ce66" active-text="Shutdown now"
+                inactive-text="Shutdown after tasks are done" />
+        </div>
+        <div v-else>
+            <h1>Cannot connect to server.</h1>
+        </div>
+        <template #footer v-if="isConnectServer">
             <div class="dialog-footer">
+                <el-button v-if="isLockShutdown" type="primary" :icon="LockComponent"
+                    @click="handleLockShutdown">Shutdown</el-button>
+                <el-button v-else :icon="UnlockComponent" @click="handleLockShutdown">Shutdown</el-button>
                 <el-button v-if="tasks !== 0" @click="cancelAllTasks">Cancel All Tasks</el-button>
-                <el-button v-if="isShutdownInTasks" type="primary" @click="cancelShutdown">Cancel Shutdown</el-button>
+                <el-button v-if="isShutdownInTasks" type="primary" @click="cancelShutdown">Cancel
+                    Shutdown</el-button>
                 <el-button @click="isDialogVisible = false">Cancel</el-button>
-                <el-button v-loading.fullscreen.lock="fullscreenLoading" type="danger" @click="handleShutdown">
+                <el-button id="shutdown-server-button" v-loading.fullscreen.lock="fullscreenLoading" type="danger"
+                    @click="handleShutdown" :disabled="isLockShutdown">
                     ShutDown
                 </el-button>
             </div>
@@ -22,12 +32,17 @@
 
 <script>
 import { serverOperate } from '@/common/varchiveVideo.js'
-import { ElSwitch, ElMessage } from "element-plus";
-
+import { ElSwitch, ElMessage } from "element-plus"
+import { Unlock, Lock } from '@element-plus/icons-vue'
+import { markRaw } from 'vue'
 
 export default {
     data() {
         return {
+            UnlockComponent: markRaw(Unlock),
+            LockComponent: markRaw(Lock),
+            isLockShutdown: false,
+            isConnectServer: true,
             shutdownInstantChecked: false,
             isDialogVisible: this.dialogVisible,
             tasks: 0,
@@ -61,6 +76,10 @@ export default {
         }
     },
     methods: {
+        async handleLockShutdown() {
+            const newVal = !this.isLockShutdown
+            await serverOperate(["shutdown", newVal ? "lock" : "unlock"])
+        },
         openFullScreen() {
             this.fullscreenLoading = true
             setTimeout(() => {
@@ -74,18 +93,12 @@ export default {
         async handleShutdown() {
             if (this.shutdownInstantChecked) {
                 this.openFullScreen()
-                const res = await serverOperate(["shutdown", "instant"])
-                if (res.returnCode !== 0) {
-                    return
-                }
+                await serverOperate(["shutdown", "instant"])
             } else {
                 if (this.tasks === 0) {
                     this.openFullScreen()
                 }
-                const res = await serverOperate(["shutdown", "default"])
-                if (res.returnCode !== 0) {
-                    return
-                }
+                await serverOperate(["shutdown", "default"])
             }
         },
         async cancelAllTasks() {
@@ -113,13 +126,17 @@ export default {
         async updateServerInfo() {
             const res = await serverOperate(["info"])
             if (res.returnCode !== 0) {
+                this.isConnectServer = false
                 return
+            } else {
+                this.isConnectServer = true
+                const serverInfo = res.json
+                this.tasks = serverInfo.tasks
+                this.iinaConnections = serverInfo.iinaConnections
+                this.varchiveConnections = serverInfo.varchiveConnections
+                this.isShutdownInTasks = serverInfo.isShutdownInTasks
+                this.isLockShutdown = serverInfo.isLockShutdown
             }
-            const serverInfo = res.json
-            this.tasks = serverInfo.tasks
-            this.iinaConnections = serverInfo.iinaConnections
-            this.varchiveConnections = serverInfo.varchiveConnections
-            this.isShutdownInTasks = serverInfo.isShutdownInTasks
         },
     }
 }

@@ -2,12 +2,13 @@
     "server": {
         "host": "127.0.0.1",
         "port": 8999,
-        "maxWebsocketConnections":100
+        "maxWebsocketConnections": 100,
+        "isLockShutdown": false
     },
     "iina": {
         "path": "/Applications/IINA.app",
-        "varchiveDirURL":"com.colliderli.iina/varchive",
-        "varchiveConfig":"config.plist"
+        "varchiveDirURL": "com.colliderli.iina/varchive",
+        "varchiveConfig": "config.plist"
     },
     "varchive": {
         "host": "localhost",

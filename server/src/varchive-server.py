@@ -49,6 +49,12 @@ with open(CONFIG_FILE, mode="r", encoding="utf-8") as f:
 HOST = Config["server"]["host"]
 PORT = Config["server"]["port"]
 
+
+def syncConfig():
+    with open(CONFIG_FILE, mode="w", encoding="utf-8") as f:
+        f.write(json.dumps(Config, ensure_ascii=False, indent=4))
+
+
 SystemRunner = systemRun.SystemRun()
 ResourceMap = resourceMap.ResourceMapManager(
     Config,
@@ -274,16 +280,30 @@ async def serverOperate(request: Request, sm: ServerManage):
             "iinaConnections": WebsocketManager.getIinaConnections(),
             "varchiveConnections": WebsocketManager.getVarchiveConnections(),
             "isShutdownInTasks": videoEditing.PQueue.hasKey("shutdown"),
+            "isLockShutdown": Config["server"]["isLockShutdown"],
         }
     elif sm.command[0] == "shutdown":
         if sm.command[1] == "instant":
+            if Config["server"]["isLockShutdown"]:
+                return {"statue": "Error: Shutdown is locked."}
             command = [f"{SHELL_PATH}/varchive-stop"]
             SystemRunner.put(command)
             return {"statue": "Shutdown"}
         elif sm.command[1] == "cancel":
             videoEditing.PQueue.cancel("shutdown")
             return {"statue": "Canceled"}
+        elif sm.command[1] == "lock":
+            Config["server"]["isLockShutdown"] = True
+            syncConfig()
+            return {"statue": "locked"}
+        elif sm.command[1] == "unlock":
+            Config["server"]["isLockShutdown"] = False
+            syncConfig()
+            return {"statue": "Unlocked"}
         else:
+            if Config["server"]["isLockShutdown"]:
+                return {"statue": "Error: Shutdown is locked."}
+
             # shutdown after tasks in PQueue are done
             def callBack(TaskStatus):
                 pass
