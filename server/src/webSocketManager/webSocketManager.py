@@ -556,3 +556,23 @@ class WebSocketManager:
         print(command)
         self.SystemRunner.put(command, self.__callbackForOpenInIina, ID)
         return ""
+
+    async def __callbackForShowIina(self, res, ID: int):
+        if res.returncode != 0:
+            print(res.stderr)
+            message = infoManager.VarchiveInfoManager.genNotificationMessageForVarchive(
+                "notification", "error", "Error while showing iina windows.", res.stderr
+            )
+            await self.sendTextToVarchive(ID, message)
+
+    def showIinaWindows(
+        self,
+        ID: int,
+    ):
+        command = [
+            "osascript",
+            "-e",
+            'tell application "System Events" to tell process "IINA" to set frontmost to true',
+        ]
+        print(command)
+        self.SystemRunner.put(command, self.__callbackForShowIina, ID)

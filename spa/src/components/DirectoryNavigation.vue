@@ -44,8 +44,10 @@ export default {
                 }
             } else if (event.key === 'Backspace') {
                 if (this.mouseOverRouterLink != "") {
-                    await fileOperate(this.mouseOverRouterLink, "moveToTrash")
-                    window.location.reload();
+                    const res = await fileOperate(this.mouseOverRouterLink, "moveToTrash")
+                    if (res.returnCode === 0) {
+                        window.location.reload();
+                    }
                 }
             } else if (event.key === 'Meta') {
                 this.isMetaKeyDown = true

@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="isDialogVisible" title="Backend" width="500">
+    <el-dialog v-model="isDialogVisible" title="Backend" width="800">
         <div v-if="isConnectServer">
             <p>Tasks: {{ tasks }}</p>
             <p>IINA connections: {{ iinaConnections }} </p>

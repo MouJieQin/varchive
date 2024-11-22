@@ -48,15 +48,16 @@ export const fileOperate = async (path, command) => {
                 message: message.detail,
                 type: "error",
             });
-            return;
+            return { returnCode: 1 };
         }
         ElMessage({
             message: command + "!",
             type: "success",
         });
+        return { returnCode: 0 };
     } catch (error) {
         console.log("Request Failed:", error);
-        return;
+        return { returnCode: 1 };
     }
 };
 

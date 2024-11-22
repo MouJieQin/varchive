@@ -14,6 +14,7 @@
 import { onBeforeRouteLeave } from 'vue-router'
 import DirectoryNavigation from '@/components/DirectoryNavigation.vue'
 import config from '@/config.json'
+import { fileOperate } from '@/common/varchiveVideo.js'
 // import NotFound from '@/views/NotFound.vue';
 
 export default {
