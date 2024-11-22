@@ -9,6 +9,12 @@ const varchivePath = splits.splice(0, splits.length - 2).join("/");
 const checkInstallPath = varchivePath.concat("/shell/varchive-checkInstall");
 const installPath = varchivePath.concat("/install");
 const startPath = varchivePath.concat("/shell/varchive-start");
+// Access command-line arguments
+const args = process.argv.slice(2);
+// Process the command-line arguments
+// args.forEach((arg) => {
+//     console.log("Command-line argument:", arg);
+// });
 
 // Create the dock menu template
 const dockMenuTemplate = [
@@ -157,7 +163,7 @@ async function startServer() {
 
 const NODE_ENV = process.env.NODE_ENV;
 
-function createWindow() {
+function createWindow(url = "http://localhost:5999/") {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
     const mainWindow = new BrowserWindow({
         width: width,
@@ -167,7 +173,7 @@ function createWindow() {
         },
     });
 
-    mainWindow.loadURL("http://localhost:5999/");
+    mainWindow.loadURL(url);
     if (NODE_ENV === "development") {
         mainWindow.webContents.openDevTools();
     }
@@ -207,7 +213,11 @@ app.whenReady().then(async () => {
     } else {
         await startServer();
         await cancelShutdown();
-        createWindow();
+        if (args.length > 0) {
+            createWindow(args[0]);
+        } else {
+            createWindow();
+        }
         app.on("activate", function () {
             if (BrowserWindow.getAllWindows().length === 0) {
                 createWindow();
