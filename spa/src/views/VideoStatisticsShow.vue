@@ -1,10 +1,10 @@
 <template>
-    <el-icon v-show="!isSort" class="icon" style="margin-left: 15px">
-        <SortDown @click="async () => { this.isSort = true; await this.pageUpdateForBarChart(true) }" />
-    </el-icon>
-    <el-icon v-show="isSort" class="icon" style="margin-left: 15px">
-        <RefreshLeft @click="async () => { this.isSort = false; await this.pageUpdateForBarChart(true) }" />
-    </el-icon>
+    <el-button v-if="!isSort" :icon="SortDownRaw"
+        @click="async () => { this.isSort = true; await this.pageUpdateForBarChart(true) }">
+    </el-button>
+    <el-button v-if="isSort" :icon="RefreshLeftRaw"
+        @click="async () => { this.isSort = false; await this.pageUpdateForBarChart(true) }">
+    </el-button>
     <div class="scroll-container" id="statistics-scroll-container" style="margin-top:15px;">
         <div>
             <div id="bar-chart" style="float: left; width: 100%; height: 500px;"></div>
@@ -15,10 +15,14 @@
 <script>
 import * as echarts from 'echarts'
 import { SortDown, RefreshLeft } from '@element-plus/icons-vue'
+import { markRaw } from 'vue'
+
 export default {
     components: { SortDown, RefreshLeft },
     data() {
         return {
+            SortDownRaw: markRaw(SortDown),
+            RefreshLeftRaw: markRaw(RefreshLeft),
             pxPerBar: 33,
             isSort: false,
             barChart: null,

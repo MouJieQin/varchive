@@ -21,8 +21,9 @@
                 <el-button v-if="isShutdownInTasks" type="primary" @click="cancelShutdown">Cancel
                     Shutdown</el-button>
                 <el-button @click="isDialogVisible = false">Cancel</el-button>
-                <el-button id="shutdown-server-button" v-loading.fullscreen.lock="fullscreenLoading" type="danger"
-                    @click="handleShutdown" :disabled="isLockShutdown">
+                <el-button id="shutdown-server-button" :icon="SwitchButtonRaw"
+                    v-loading.fullscreen.lock="fullscreenLoading" type="danger" @click="handleShutdown"
+                    :disabled="isLockShutdown">
                     ShutDown
                 </el-button>
             </div>
@@ -33,7 +34,7 @@
 <script>
 import { serverOperate } from '@/common/varchiveVideo.js'
 import { ElSwitch, ElMessage } from "element-plus"
-import { Unlock, Lock } from '@element-plus/icons-vue'
+import { Unlock, Lock, SwitchButton } from '@element-plus/icons-vue'
 import { markRaw } from 'vue'
 
 export default {
@@ -41,6 +42,7 @@ export default {
         return {
             UnlockComponent: markRaw(Unlock),
             LockComponent: markRaw(Lock),
+            SwitchButtonRaw: markRaw(SwitchButton),
             isLockShutdown: false,
             isConnectServer: true,
             shutdownInstantChecked: false,

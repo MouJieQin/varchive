@@ -2,34 +2,29 @@
     <div>
         <Anchor class="sticky" />
         <div id="video-details">
-            <div style="display: block; text-align: right;">
-                <el-icon v-if="connection === 'serverConnected'" style="color:#67C23A; margin-right: 10px">
-                    <CircleCheck />
-                </el-icon>
-                <el-icon v-else-if="connection === 'iinaConnected'" style="color:#67C23A; margin-right: 10px">
-                    <CircleCheckFilled />
-                </el-icon>
-                <el-icon v-else style="color:#E6A23C; margin-right: 10px">
-                    <WarningFilled />
-                </el-icon>
-                <el-icon class="icon" style="color: #F56C6C;margin-right: 10px">
-                    <Delete @click="deleteVarchive" />
-                </el-icon>
+            <div style="float: right; text-align: right;">
+                <el-button-group class="ml-4">
+                    <el-button v-if="connection === 'serverConnected'" :icon="CheckRaw" type="primary" plain circle>
+                    </el-button>
+                    <el-button v-else-if="connection === 'iinaConnected'" :icon="CheckRaw" type="success" circle>
+                    </el-button>
+                    <el-button v-else :icon="WarningRaw" type="warning" circle>
+                    </el-button>
+                    <el-button :icon="DeleteRaw" type="danger" plain circle style="float:right" @click="deleteVarchive">
+                    </el-button>
+                </el-button-group>
             </div>
             <section class="container">
                 <section id="introduction" class="introduction">
-                    <div style="display: flex; align-items: center;">
-                        <el-icon v-if="!isInfoEditing" class="icon" style="margin-bottom:10px">
-                            <Edit @click="isInfoEditing = true" />
-                        </el-icon>
-                        <div v-else>
-                            <el-icon class="icon" style="margin-left: 8px">
-                                <Close @click="isInfoEditing = false" />
-                            </el-icon>
-                            <el-icon class="icon" style="margin-left: 8px">
-                                <Check @click="changeInfo(infoEditing)" />
-                            </el-icon>
-                        </div>
+                    <div style="display: flex; align-items: center; margin-bottom:10px">
+                        <el-button-group class="ml-4">
+                            <el-button v-if="!isInfoEditing" :icon="EditRaw" style="" @click="isInfoEditing = true">
+                            </el-button>
+                            <el-button v-if="isInfoEditing" :icon="CloseRaw" @click="isInfoEditing = false">
+                            </el-button>
+                            <el-button v-if="isInfoEditing" :icon="CheckRaw" @click="changeInfo(infoEditing)">
+                            </el-button>
+                        </el-button-group>
                     </div>
                     <div class="title">
                         <h1 v-if="!isInfoEditing" style="text-align: center;">{{ this.videoInfo.title }}
@@ -58,52 +53,49 @@
                         style="margin-bottom: 10px;" placeholder="Please input more information" />
                 </section>
                 <section id="previews" class="previews">
-                    <h2>Previews
-                        <el-icon v-show="isHidePreview" class="icon" style="margin-left: 8px">
+                    <h2 @mouseover="isMouseOverPreview = true" @mouseout="isMouseOverPreview = false">Previews
+                        <el-icon v-show="isMouseOverPreview && isHidePreview" class="icon" style="margin-left: 8px">
                             <View @click="isHidePreview = false" />
                         </el-icon>
-                        <el-icon v-show="!isHidePreview" class="icon" style="margin-left: 8px">
+                        <el-icon v-show="isMouseOverPreview && !isHidePreview" class="icon" style="margin-left: 8px">
                             <Hide @click="isHidePreview = true" />
                         </el-icon>
                     </h2>
                     <div v-show="!isHidePreview">
-                        <div>
-                            <el-icon v-show="!isPlayPreview" class="icon" style="margin-left: 15px">
-                                <VideoPlay @click="isPlayPreview = true" />
-                            </el-icon>
-                            <el-icon v-show="isPlayPreview" class="icon" style="margin-left: 15px">
-                                <VideoPause @click="isPlayPreview = false" />
-                            </el-icon>
+                        <el-button-group class="ml-4" style="margin-bottom: 15px;">
+                            <el-button v-show="!isPlayPreview" :icon="VideoPlayRaw" @click="isPlayPreview = true">
+                            </el-button>
+                            <el-button v-show="isPlayPreview" :icon="VideoPauseRaw" @click="isPlayPreview = false">
+                            </el-button>
                             <el-popconfirm confirm-button-text="Delete" cancel-button-text="No" :icon="WarningFilledRaw"
                                 icon-color="#E6A23C" title="Delete all clips?" @confirm="deletePreviews" @cancel="">
                                 <template #reference>
-                                    <el-icon class="icon" style="margin-left: 15px">
-                                        <Delete />
-                                    </el-icon>
+                                    <el-button :icon="DeleteRaw">
+                                    </el-button>
                                 </template>
                             </el-popconfirm>
-
                             <el-popconfirm confirm-button-text="Yes" cancel-button-text="No" icon-color="#909399"
                                 title="Generate clips?" @confirm="generatePreview" @cancel="">
                                 <template #reference>
-                                    <el-icon class="icon" style="margin-left: 15px">
-                                        <Film />
-                                    </el-icon>
+                                    <el-button :icon="FilmRaw">
+                                    </el-button>
                                 </template>
                             </el-popconfirm>
+                        </el-button-group>
+                        <div>
+                            <WebpPreview v-for="clip in clips" @click="seekTo(clip.startTime)" :key="clip"
+                                :webpPath="this.webpPath" :clip="clip" :isPlay="isPlayPreview" />
                         </div>
-                        <WebpPreview v-for="clip in clips" @click="seekTo(clip.startTime)" :key="clip"
-                            :webpPath="this.webpPath" :clip="clip" :isPlay="isPlayPreview" />
                     </div>
-
                 </section>
                 <br style="clear:both" />
                 <section id="bookmarks" class="bookmarks">
-                    <h2>Bookmarks
-                        <el-icon v-show="isHideBookmarks" class="icon" style="margin-left: 8px">
+                    <h2 @mouseover="isMouseoverBookmarks = true" @mouseout="isMouseoverBookmarks = false">Bookmarks
+                        <el-icon v-show="isMouseoverBookmarks && isHideBookmarks" class="icon" style="margin-left: 8px">
                             <View @click="isHideBookmarks = false" />
                         </el-icon>
-                        <el-icon v-show="!isHideBookmarks" class="icon" style="margin-left: 8px">
+                        <el-icon v-show="isMouseoverBookmarks && !isHideBookmarks" class="icon"
+                            style="margin-left: 8px">
                             <Hide @click="isHideBookmarks = true" />
                         </el-icon>
                     </h2>
@@ -117,21 +109,20 @@
                             </template>
                         </el-input>
                         <div style="clear:both; margin-bottom: 15px;">
-                            <el-icon v-show="!isPlayBookmarks" class="icon" style="margin-left: 15px">
-                                <VideoPlay @click="isPlayBookmarks = true" />
-                            </el-icon>
-                            <el-icon v-show="isPlayBookmarks" class="icon" style="margin-left: 15px">
-                                <VideoPause @click="isPlayBookmarks = false" />
-                            </el-icon>
-                            <el-icon class="icon" style="margin-left: 15px">
-                                <Delete @click="clearBookmarks" />
-                            </el-icon>
-                            <el-icon v-show="!isWebpsOnly" class="icon" style="margin-left: 15px">
-                                <Grid @click="isWebpsOnly = true" />
-                            </el-icon>
-                            <el-icon v-show="isWebpsOnly" class="icon" style="margin-left: 15px">
-                                <List @click="isWebpsOnly = false" />
-                            </el-icon>
+                            <el-button-group class="ml-4">
+                                <el-button v-show="!isPlayBookmarks" :icon="VideoPlayRaw"
+                                    @click="isPlayBookmarks = true">
+                                </el-button>
+                                <el-button v-show="isPlayBookmarks" :icon="VideoPauseRaw"
+                                    @click="isPlayBookmarks = false">
+                                </el-button>
+                                <el-button :icon="DeleteRaw" @click="clearBookmarks">
+                                </el-button>
+                                <el-button v-show="!isWebpsOnly" :icon="GridRaw" @click="isWebpsOnly = true">
+                                </el-button>
+                                <el-button v-show="isWebpsOnly" :icon="ListRaw" @click="isWebpsOnly = false">
+                                </el-button>
+                            </el-button-group>
                         </div>
                         <div v-show="isWebpsOnly">
                             <WebpPreview v-for="bookmark in this.bookmarkInfo.bookmarks"
@@ -152,11 +143,12 @@
                 </section>
                 <br style="clear:both" />
                 <section id="subtitles" class="subtitles">
-                    <h2>Subtitle
-                        <el-icon v-show="isHideSubtitles" class="icon" style="margin-left: 8px">
+                    <h2 @mouseover="isMouseoverSubtitles = true" @mouseout="isMouseoverSubtitles = false">Subtitle
+                        <el-icon v-show="isMouseoverSubtitles && isHideSubtitles" class="icon" style="margin-left: 8px">
                             <View @click="isHideSubtitles = false" />
                         </el-icon>
-                        <el-icon v-show="!isHideSubtitles" class="icon" style="margin-left: 8px">
+                        <el-icon v-show="isMouseoverSubtitles && !isHideSubtitles" class="icon"
+                            style="margin-left: 8px">
                             <Hide @click="isHideSubtitles = true" />
                         </el-icon>
                     </h2>
@@ -168,10 +160,9 @@
                                 </el-icon>
                             </template>
                         </el-input>
-                        <el-icon v-show="isStopAutoScrollSub" class="icon" @click="isStopAutoScrollSub = false"
-                            style="clear:both;margin-left: 15px;">
-                            <RefreshLeft />
-                        </el-icon>
+                        <el-button v-show="isStopAutoScrollSub" :icon="RefreshLeftRaw"
+                            @click="isStopAutoScrollSub = false" style="clear:both">
+                        </el-button>
                         <SubtitleSelector :loadedSubtitles="this.playerMessage.loadedSubtitles"
                             :subtitleInfoes="this.subtitleInfoes" :subShowing="this.subShowing"
                             :setSubtitleInfoes="this.setSubtitleInfoes" :setSubShowing="this.setSubShowing" />
@@ -186,7 +177,8 @@
                     </div>
                 </section>
                 <section id="statistics" class="statistics">
-                    <h2>Statistics</h2>
+                    <h2 @mouseover="isMouseoverStatistics = true" @mouseout="isMouseoverStatistics = false">Statistics
+                    </h2>
                     <VideoStatisticsShow :statistics="statistics" :seekTo="seekTo" />
                 </section>
             </section>
@@ -197,7 +189,7 @@
 
 <script>
 import config from '@/config.json'
-import { Search, View, Hide, CircleCheck, CircleCheckFilled, WarningFilled, Check, Close, Edit, Refresh, Delete, VideoPlay, VideoPause, Film, RefreshLeft, Grid, List } from '@element-plus/icons-vue'
+import { Search, View, Hide, CircleCheck, CircleCheckFilled, Warning, WarningFilled, Check, Close, Edit, Refresh, Delete, VideoPlay, VideoPause, Film, RefreshLeft, Grid, List } from '@element-plus/icons-vue'
 import WebpPreview from '@/components/WebpPreview.vue'
 import Bookmark from '@/components/Bookmark.vue'
 import Subtitle from '@/components/Subtitle.vue'
@@ -213,6 +205,20 @@ export default {
     data() {
         return {
             WarningFilledRaw: markRaw(WarningFilled),
+            DeleteRaw: markRaw(Delete),
+            CircleCheckFilledRaw: markRaw(CircleCheckFilled),
+            CircleCheckRaw: markRaw(CircleCheck),
+            WarningFilledRaw: markRaw(WarningFilled),
+            WarningRaw: markRaw(Warning),
+            EditRaw: markRaw(Edit),
+            CloseRaw: markRaw(Close),
+            CheckRaw: markRaw(Check),
+            VideoPlayRaw: markRaw(VideoPlay),
+            VideoPauseRaw: markRaw(VideoPause),
+            FilmRaw: markRaw(Film),
+            GridRaw: markRaw(Grid),
+            ListRaw: markRaw(List),
+            RefreshLeftRaw: markRaw(RefreshLeft),
             currentPath: "",
             connection: "closed",
             isInfoEditing: false,
@@ -243,9 +249,13 @@ export default {
             isBookmarksMouseOver: false,
             bookmarkInfo: {},
             isHidePreview: false,
+            isMouseOverPreview: false,
             isHideBookmarks: false,
+            isMouseoverBookmarks: false,
             isHideSubtitles: false,
+            isMouseoverSubtitles: false,
             isHideStatistics: false,
+            isMouseoverStatistics: false,
             statistics: {},
         }
     },
@@ -324,6 +334,9 @@ export default {
         }
     },
     methods: {
+        markraw(component) {
+            return this.markRaw(component)
+        },
         highlightTextWithMatch(inputText, pattern) {
             if (pattern === "") {
                 return {

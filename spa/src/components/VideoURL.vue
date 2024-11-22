@@ -4,21 +4,19 @@
             style="width: 100px; margin-top:20px; margin-bottom:20px;text-align: center">
             <el-option v-for="path in paths" :key="path.url" :label="path.url" :value="path.url" />
         </el-select>
-        <el-icon v-if="!isEditing" class="icon" style="margin-left: 10px">
-            <Edit @click="isEditing = true" />
-        </el-icon>
+        <el-button v-if="!isEditing" :icon="EditRaw" @click="isEditing = true">
+        </el-button>
     </div>
     <div v-if="isEditing">
         <div style="margin-bottom: 15px;">
-            <el-icon class="icon" style="margin-left: 15px">
-                <Close @click="isEditing = false" />
-            </el-icon>
-            <el-icon class="icon" style="margin-left: 15px">
-                <Check @click="handleUpdateURL" />
-            </el-icon>
-            <el-icon class="icon" style="margin-left: 15px">
-                <Plus @click="addUrl" />
-            </el-icon>
+            <el-button-group class="ml-4">
+                <el-button :icon="CloseRaw" @click="isEditing = false">
+                </el-button>
+                <el-button :icon="CheckRaw" @click="handleUpdateURL">
+                </el-button>
+                <el-button :icon="PlusRaw" @click="addUrl">
+                </el-button>
+            </el-button-group>
         </div>
         <div v-for="(url, index) in urls" style="margin-bottom: 10px;">
             <el-input v-model="url.url" clearable style="max-width: 600px">
@@ -42,9 +40,15 @@
 <script>
 import { CopyDocument, Plus, Check, Close, Edit, Refresh, Delete, VideoPlay, } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus';
+import { markRaw } from 'vue'
+
 export default {
     data() {
         return {
+            EditRaw: markRaw(Edit),
+            PlusRaw: markRaw(Plus),
+            CloseRaw: markRaw(Close),
+            CheckRaw: markRaw(Check),
             isEditing: false,
             urls: JSON.parse(JSON.stringify(this.paths)),
             // urls: typeof this.paths !== 'undefined' ? JSON.parse(JSON.stringify(this.paths)) : {},
