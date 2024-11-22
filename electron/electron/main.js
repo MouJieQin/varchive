@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen } = require("electron");
+const { app, BrowserWindow, screen, Menu, MenuItem } = require("electron");
 const path = require("path");
 const { exec } = require("child_process");
 const { dialog } = require("electron");
@@ -9,6 +9,28 @@ const varchivePath = splits.splice(0, splits.length - 2).join("/");
 const checkInstallPath = varchivePath.concat("/shell/varchive-checkInstall");
 const installPath = varchivePath.concat("/install");
 const startPath = varchivePath.concat("/shell/varchive-start");
+
+// Create the dock menu template
+const dockMenuTemplate = [
+    {
+        label: "File",
+        submenu: [
+            {
+                label: "Custom",
+                click() {
+                    // Action to perform when the menu item is clicked
+                    console.log("Custom option clicked");
+                },
+            },
+            { type: "separator" },
+            { role: "quit" },
+        ],
+    },
+];
+// Build the dock menu from the template
+const dockMenu = Menu.buildFromTemplate(dockMenuTemplate);
+// Set the application dock menu
+app.dock.setMenu(dockMenu);
 
 function runShellCommand(command) {
     return new Promise((resolve, reject) => {
@@ -159,7 +181,26 @@ async function cancelShutdown() {
     const res = await serverOperate(["shutdown", "cancel"]);
 }
 
+function setDockMenu() {
+    // Get the existing menu items
+    const dockMenu = app.dock.getMenu();
+    // Add a new option to the dock menu
+    dockMenu.append(
+        new MenuItem({
+            label: "Open a new Window",
+            click() {
+                createWindow();
+                // Action to be performed when the new menu item is clicked
+            },
+        })
+    );
+
+    // Set the updated dock menu
+    app.dock.setMenu(dockMenu);
+}
+
 app.whenReady().then(async () => {
+    setDockMenu();
     const res = await checkInstall();
     if (res !== 0) {
         app.quit();

@@ -4,10 +4,9 @@
             <Logo />
         </router-link>
         <router-link :to="{ name: 'video' }">Video</router-link>
-        <router-link :to="{ name: 'video' }">
-            <p @click.prevent=" shutdownDialogVisible = true">Backend</p>
-        </router-link>
-        <!-- <router-link :to="{ name: 'help' }">Help</router-link> -->
+        <a @click.prevent=" shutdownDialogVisible = true">Backend</a>
+        <a href="https://github.com/MouJieQin/varchive" target="_blank">Github</a>
+        <a href="https://github.com/MouJieQin/varchive/releases" target="_blank">Update</a>
     </div>
     <Backend :dialogVisible="shutdownDialogVisible" :setDialogVisible="(val) => { this.shutdownDialogVisible = val }" />
 </template>
