@@ -15,12 +15,13 @@ Download the corresponding version of [release](https://github.com/MouJieQin/iin
 ### Desktop App
 
 <p align="center">
-<img src="electron/Varchive/electron/build/icon.svg" alt="app.icon" height=100 />
+<img src="electron/electron/build/icon.svg" alt="app.icon" height=100 />
 </p>
+
 
 Download the dmg in [releases](https://github.com/MouJieQin/varchive/releases). It will still open the terminal to install some dependencies when you open the app for the first time. You will be asked to input your system password during the process. I cannot ensure that the install process will work even though I tested it in a new virtual machine.
 
-![app](assets/app.png)
+![app](https://github.com/MouJieQin/assets/blob/main/varchive/assets/app.png)
 
 
 
@@ -103,7 +104,7 @@ npm run dev
 
 Open a video using [iina-for-varchive](https://github.com/MouJieQin/iina-for-varchive), press `a` key first then press `o` key. A varchive page of this video will be opened on your browser. (Note: you have to use iina defautl key bindings config to do it, or you have to config your key bindings first. )
 
-![directory-navigation](assets/directory.mov.gif)
+![directory-navigation](https://github.com/MouJieQin/assets/blob/main/varchive/assets/directory.mov.gif)
 
 When you open a local video using [iina-for-varchive](https://github.com/MouJieQin/iina-for-varchive) and archive the video by the keyboard shortcut `a`(default key), a varchive link folder will be created in the same directory as the video.  It has the same name as the video, with a `.varchive` postfix. e.g. 
 
@@ -119,12 +120,12 @@ You can also archive a network video resources (only support hls format, e.g. `m
 
 - If you want to open a file when navigation, you can click the empty place of navigation bar where the file you want open is, then move the mouse over it and press the f on your keybord. It will open the file in your Finder app.
 
-![bookmark-seek](assets/bookmark-seek.mov.gif)
+![bookmark-seek](https://github.com/MouJieQin/assets/blob/main/varchive/assets/bookmark-seek.mov.gif)
 
-![bookmark-mark-seek](assets/bookmark-mark-seek.mov.gif)
+![bookmark-mark-seek](https://github.com/MouJieQin/assets/blob/main/varchive/assets/bookmark-mark-seek.mov.gif)
 
-![bookmark-edit](assets/bookmark-edit.mov.gif)
+![bookmark-edit](https://github.com/MouJieQin/assets/blob/main/varchive/assets/bookmark-edit.mov.gif)
 
-![subtitle-search](assets/subtitle-search.mov.gif)
+![subtitle-search](https://github.com/MouJieQin/assets/blob/main/varchive/assets/subtitle-search.mov.gif)
 
-![video-statistic](assets/statistic.mov.gif)
+![video-statistic](https://github.com/MouJieQin/assets/blob/main/varchive/assets/statistic.mov.gif)

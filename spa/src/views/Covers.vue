@@ -48,7 +48,7 @@ export default {
     methods: {
         load() {
             if (this.varchiveVideos.length) {
-                var count = 30
+                var count = 28
                 for (var i = this.varchiveVideosShowing.length, len = this.varchiveVideos.length; i < len && count > 0; --count, ++i) {
                     this.varchiveVideosShowing.push(this.varchiveVideos[i])
                 }
