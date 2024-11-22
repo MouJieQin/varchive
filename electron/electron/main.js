@@ -1,5 +1,6 @@
 const { app, BrowserWindow, screen, Menu, MenuItem } = require("electron");
 const path = require("path");
+const fs = require("fs");
 const { exec } = require("child_process");
 const { dialog } = require("electron");
 
@@ -17,6 +18,20 @@ const args = process.argv.slice(2);
 // });
 
 // Create the dock menu template
+
+const pipePath = "/tmp/electron_pipe";
+
+function receiveMessageFromPip() {
+    console.log("receiveMessageFromPip....");
+    fs.createReadStream(pipePath, { encoding: "utf8" }).on("data", (data) => {
+        console.log("Received message:", data);
+        receiveMessageFromPip();
+        createWindow(data);
+    });
+}
+
+// Additional setup for your Electron app
+
 const dockMenuTemplate = [
     {
         label: "File",
@@ -207,6 +222,7 @@ function setDockMenu() {
 
 app.whenReady().then(async () => {
     setDockMenu();
+    receiveMessageFromPip();
     const res = await checkInstall();
     if (res !== 0) {
         app.quit();
