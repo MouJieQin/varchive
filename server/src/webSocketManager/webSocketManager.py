@@ -97,7 +97,7 @@ class WebSocketManager:
                     await self.activeIinaConnections[ID].send_text(text)
         except Exception as e:
             print(f"An error occurred while sending text to IINA[{ID}]: {e}")
-            self.disconnectIina(ID)
+            await self.disconnectIina(ID)
 
     async def sendTextToVarchiveImple(self, ID: int, text: str):
         try:
@@ -114,7 +114,7 @@ class WebSocketManager:
 
     async def sendTextToAppImple(self, text: str):
         try:
-            if self.activeAppConnection != None:
+            if self.activeAppConnection is not None:
                 await self.activeAppConnection.send_text(text)
         except Exception as e:
             print(f"An error occurred while sending text to App: {e}")
@@ -125,7 +125,7 @@ class WebSocketManager:
 
     def wsApp(self) -> Dict[str, any]:
         return {
-            "status": self.activeAppConnection != None,
+            "status": self.activeAppConnection is not None,
             "sendTextToApp": self.sendTextToApp,
         }
 
@@ -522,23 +522,47 @@ class WebSocketManager:
     async def receiveMessageFromIina(self, iinaID: int, websocket: WebSocket):
         messages = self.messagesFromIina[iinaID]
         while self.isIinaConnected(iinaID):
-            text = await websocket.receive_text()
-            await self.handleMessageFromIINA(iinaID, text, messages, websocket)
+            try:
+                text = await websocket.receive_text()
+                await self.handleMessageFromIINA(iinaID, text, messages, websocket)
+            except Exception as e:
+                print(
+                    "This exception when receiving may be normal because the connection to IINA is closed.{}".format(
+                        e
+                    )
+                )
+                await self.disconnectIina(iinaID)
 
     async def receiveMessageFromVarchiveVideoDetails(
         self, varchiveVideoID: int, websocket: WebSocket
     ):
         messages = self.messagesFromVarchiveVideo[varchiveVideoID]
         while self.isVarchiveConnected(varchiveVideoID):
-            text = await websocket.receive_text()
-            await self.handleMessageFromVarchive(
-                varchiveVideoID, text, messages, websocket
-            )
+            try:
+                text = await websocket.receive_text()
+                await self.handleMessageFromVarchive(
+                    varchiveVideoID, text, messages, websocket
+                )
+            except Exception as e:
+                print(
+                    "This exception may be normal because the connection to varchive is closed.{}".format(
+                        e
+                    )
+                )
+                self.disconnectVarchive(varchiveVideoID)
 
     async def receiveMessageFromApp(self, websocket: WebSocket):
-        while self.activeAppConnection != None:
-            text = await websocket.receive_text()
-            await self.handleMessageFromApp(text)
+        while self.activeAppConnection is not None:
+            try:
+                text = await websocket.receive_text()
+                await self.handleMessageFromApp(text)
+            except Exception as e:
+                print(
+                    "This exception may be normal because the connection to app is closed.{}".format(
+                        e
+                    )
+                )
+                self.disconnectApp()
 
     async def sendMessageToIina(self, iinaID: int):
         while self.isIinaConnected(iinaID):
@@ -552,11 +576,11 @@ class WebSocketManager:
                     await self.sendTextToIina(iinaID, message)
                 except Exception as e:
                     print(
-                        "This exception may be normal because the connection to IINA is closed.{}".format(
+                        "This exception when sending may be normal because the connection to IINA is closed.{}".format(
                             e
                         )
                     )
-                    self.disconnectVarchive(iinaID)
+                    await self.disconnectIina(iinaID)
             else:
                 await self.sleep()
 

@@ -19,8 +19,8 @@ var webSocket = {};
 // websocket
 function retryWebsocketConnection() {
     let timer = setTimeout(async () => {
+        clearTimeout(timer);
         if (webSocket.readyState !== WebSocket.OPEN) {
-            clearTimeout(timer);
             try {
                 await webSocketManager();
             } catch (error) {
@@ -28,7 +28,7 @@ function retryWebsocketConnection() {
                 return [];
             }
         }
-    }, 2000);
+    }, 5000);
 }
 
 function handleMessage(message) {
@@ -51,8 +51,10 @@ async function webSocketManager() {
     try {
         const wsUrl = "wss://127.0.0.1:8999/ws/varchive/app/1";
         webSocket = new WebSocket(wsUrl, { agent });
-        retryWebsocketConnection();
-        webSocket.onopen = (event) => {};
+        webSocket.onerror = (error) => {
+            // console.error("WebSocket encountered an error.");
+        };
+        // webSocket.onopen = (event) => {};
         webSocket.onmessage = (event) => {
             const message = JSON.parse(event.data);
             console.log("message:", message);
