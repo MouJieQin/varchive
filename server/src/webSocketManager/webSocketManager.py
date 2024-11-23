@@ -336,10 +336,11 @@ class WebSocketManager:
             )
         )
 
-    def disconnectApp(self, ID: int):
+    def disconnectApp(self):
         self.activeAppConnection = None
 
     async def disconnectAll(self):
+        self.disconnectApp()
         for id in range(0, self.maxConnection):
             if self.isIinaConnected(id):
                 await self.disconnectIina(id)

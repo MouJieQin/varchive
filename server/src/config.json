@@ -13,5 +13,8 @@
     "varchive": {
         "host": "localhost",
         "port": "5999"
+    },
+    "app": {
+        "path": "/Applications/Varchive.app"
     }
 }

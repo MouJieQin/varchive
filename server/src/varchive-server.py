@@ -189,7 +189,7 @@ async def websocketEndpointApp(websocket: WebSocket, clientID: int):
         ]
         await asyncio.gather(*tasks_list)
     except WebSocketDisconnect:
-        WebsocketManager.disconnectApp(clientID)
+        WebsocketManager.disconnectApp()
 
 
 class ListFiles(BaseModel):

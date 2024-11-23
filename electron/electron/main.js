@@ -17,7 +17,7 @@ const args = process.argv.slice(2);
 var webSocket = {};
 
 // websocket
-async function retryWebsocketConnection() {
+function retryWebsocketConnection() {
     let timer = setTimeout(async () => {
         if (webSocket.readyState !== WebSocket.OPEN) {
             clearTimeout(timer);
@@ -34,7 +34,7 @@ async function retryWebsocketConnection() {
 function handleMessage(message) {
     switch (message.type[1]) {
         case "newWindow":
-            createWindow(message.type[2])
+            createWindow(message.type[2]);
             break;
         default:
             break;
@@ -51,7 +51,8 @@ async function webSocketManager() {
     try {
         const wsUrl = "wss://127.0.0.1:8999/ws/varchive/app/1";
         webSocket = new WebSocket(wsUrl, { agent });
-        webSocket.onopen = async (event) => {};
+        retryWebsocketConnection();
+        webSocket.onopen = (event) => {};
         webSocket.onmessage = (event) => {
             const message = JSON.parse(event.data);
             console.log("message:", message);
