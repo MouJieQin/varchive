@@ -773,6 +773,12 @@ export default {
             this.videoPath = res.videoPath
             this.webpPath = res.webpPath
             this.videoInfo = res.videoInfo
+            if (this.$route.path.startsWith('/video/Recent')) {
+                const splits = this.webpPath.split('/')
+                const metaFilename = splits[splits.length - 1]
+                const path = "/video/All/".concat(metaFilename, "/details")
+                window.location.href = path
+            }
         },
         goToIntroduce() {
             document.getElementById("introduction").scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' })

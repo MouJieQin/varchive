@@ -3,7 +3,6 @@
 
 from bookmarkManager.bookmarkManager import *
 from videoStatistics.videoStatistics import *
-import asyncio
 
 
 class IINAinfoManager(IINAbookmarkManager):
