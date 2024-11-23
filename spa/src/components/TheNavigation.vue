@@ -4,7 +4,7 @@
             <Logo />
         </router-link>
         <router-link :to="{ name: 'video' }">Video</router-link>
-        <a @click.prevent=" shutdownDialogVisible = true">Backend</a>
+        <a href="" @click.prevent=" shutdownDialogVisible = true">Backend</a>
         <a href="https://github.com/MouJieQin/varchive" target="_blank">Github</a>
         <a href="https://github.com/MouJieQin/varchive/releases" target="_blank">Update</a>
     </div>
