@@ -43,16 +43,6 @@ class RecentManager:
     def getRecentList(self):
         return [name for name in self.recentList]
 
-    # def openInVarchivebyMetaFilename(self, metaFilename: str):
-    #     if metaFilename not in self.metaMapRecentName.keys():
-    #         return
-    #     recentName = self.metaMapRecentName[metaFilename]
-    #     recentPath = self.__getRecentPathByRecentName(recentName)
-    #     if not os.path.exists(recentPath):
-    #         return
-    #     recentURL = self.recentURL + "/" + recentName + "/details"
-    #     self.SystemRunner.put(["open", recentURL])
-
     def __popByRecentName(self, recenName: str):
         # recentName may already be renamed by user
         if recenName in self.recentList:
@@ -60,7 +50,7 @@ class RecentManager:
 
     @staticmethod
     def matchTimeFormat(text: str):
-        pattern = re.compile(r"^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.\d{3}")
+        pattern = re.compile(r"^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.\d{3}$")
         return pattern.match(text)
 
     def __initRecentList(self):
@@ -81,12 +71,12 @@ class RecentManager:
         while len(self.recentList) > self.maxHistory:
             self.__pop()
 
-    def push(self, title: str, metaFilename: str):
+    def push(self, metaFilename: str):
         while len(self.recentList) >= self.maxHistory:
             self.__pop()
         currTime = datetime.datetime.now()
         formattedCurrTime = currTime.strftime("%Y-%m-%d_%H-%M-%S.%f")[:-3]
-        recentName = formattedCurrTime + "-" + title
+        recentName = formattedCurrTime
         if metaFilename in self.metaMapRecentName.keys():
             oldRecentName = self.metaMapRecentName[metaFilename]
             self.__popByRecentName(oldRecentName)
@@ -227,11 +217,7 @@ class ResourceMapManager:
         metaPath = self.getMetaPathByMetaFilename(metaFilename)
         if not os.path.exists(metaPath):
             return
-        detailsPath = self.getDetailsPath(metaPath)
-        details = {}
-        with open(detailsPath, mode="r", encoding="utf-8") as f:
-            details = json.load(f)
-        self.recentManager.push(details["title"], metaFilename)
+        self.recentManager.push(metaFilename)
 
     def getAllURLbyMetaFilename(self, metaFilename: str):
         return self.allURL + "/" + metaFilename + "/details"
