@@ -164,20 +164,26 @@ async def websocketEndpointIINA(websocket: WebSocket, clientID: int):
 async def websocketEndpointVarchive(websocket: WebSocket, clientID: int):
     await WebsocketManager.connectVarchive(clientID, websocket)
     WebsocketManager.messagesFromVarchiveVideo[clientID].clear()
+    tasks_list = [
+        asyncio.create_task(
+            WebsocketManager.sendMessageToVarchiveVideoDetails(clientID)
+        ),
+        asyncio.create_task(
+            WebsocketManager.receiveMessageFromVarchiveVideoDetails(clientID, websocket)
+        ),
+    ]
     try:
-        tasks_list = [
-            asyncio.create_task(
-                WebsocketManager.sendMessageToVarchiveVideoDetails(clientID)
-            ),
-            asyncio.create_task(
-                WebsocketManager.receiveMessageFromVarchiveVideoDetails(
-                    clientID, websocket
-                )
-            ),
-        ]
         await asyncio.gather(*tasks_list)
     except WebSocketDisconnect:
         WebsocketManager.disconnectVarchive(clientID)
+    except asyncio.CancelledError:
+        print("Async task was cancelled.")
+    except asyncio.exceptions.CancelledError:
+        print("Async task was cancelled.")    
+    except Exception as e:
+        print(
+            f"/ws/varchive/video/details/: An error occurred while sending text to: {e}"
+        )
 
 
 @app.websocket("/ws/varchive/app/{clientID}")

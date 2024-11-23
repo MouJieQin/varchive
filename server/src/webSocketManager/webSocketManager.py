@@ -97,7 +97,9 @@ class WebSocketManager:
                     await self.activeIinaConnections[ID].send_text(text)
         except Exception as e:
             print(f"An error occurred while sending text to IINA[{ID}]: {e}")
+            await self.sendDispairedInfoToVarchiveByIinaID(ID)
             await self.disconnectIina(ID)
+    
 
     async def sendTextToVarchiveImple(self, ID: int, text: str):
         try:
@@ -361,13 +363,13 @@ class WebSocketManager:
         await self.sendTextToVarchive(varchiveVideoID, json.dumps(info))
 
     async def sendDispairedInfoToVarchiveByIinaID(self, iinaID: int):
+        varchiveVideoID = self.idMapFromIinaToVarchiveVideo[iinaID]
+        if varchiveVideoID == -1 or not self.activeVarchiveConnections[varchiveVideoID]:
+            return
         info = {
             "type": ["varchive", "connection", "dispaired"],
             "message": "",
         }
-        varchiveVideoID = self.idMapFromIinaToVarchiveVideo[iinaID]
-        if varchiveVideoID == -1 or not self.activeVarchiveConnections[varchiveVideoID]:
-            return
         await self.sendTextToVarchive(varchiveVideoID, json.dumps(info))
 
     async def setIDMap(self, iinaID: int, varchiveVideoID: int):
@@ -531,6 +533,7 @@ class WebSocketManager:
                         e
                     )
                 )
+                await self.sendDispairedInfoToVarchiveByIinaID(iinaID)
                 await self.disconnectIina(iinaID)
 
     async def receiveMessageFromVarchiveVideoDetails(
@@ -580,6 +583,7 @@ class WebSocketManager:
                             e
                         )
                     )
+                    await self.sendDispairedInfoToVarchiveByIinaID(iinaID)
                     await self.disconnectIina(iinaID)
             else:
                 await self.sleep()

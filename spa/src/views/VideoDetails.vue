@@ -729,7 +729,7 @@ export default {
                         }
                     }
                 }
-            }, 2000)
+            }, 3000)
         },
         async webSocketManager() {
             const id = await this.getWebsocketID()

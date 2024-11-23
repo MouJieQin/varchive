@@ -1,5 +1,7 @@
 #!/bin/bash --login
 
+# send -15 twice to stop varchive server.
+ps -ef | grep varchive-server.py | grep -v grep | awk '{print $2}' | xargs -I {} kill -15 {}
 ps -ef | grep varchive-server.py | grep -v grep | awk '{print $2}' | xargs -I {} kill -15 {}
 ps -ef | grep varchive-client | grep -v grep | awk '{print $2}' | xargs -I {} kill -15 {}
 ps -ef | grep node | grep -i varchive | grep -v grep | awk '{print $2}' | xargs -I {} kill -15 {}
