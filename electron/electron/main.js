@@ -1,8 +1,10 @@
 const { app, BrowserWindow, screen, Menu, MenuItem } = require("electron");
+const https = require("https");
 const path = require("path");
 const fs = require("fs");
 const { exec } = require("child_process");
 const { dialog } = require("electron");
+const WebSocket = require("ws");
 
 const splits = __dirname.split("/");
 const varchivePath = splits.splice(0, splits.length - 2).join("/");
@@ -12,25 +14,58 @@ const installPath = varchivePath.concat("/install");
 const startPath = varchivePath.concat("/shell/varchive-start");
 // Access command-line arguments
 const args = process.argv.slice(2);
-// Process the command-line arguments
-// args.forEach((arg) => {
-//     console.log("Command-line argument:", arg);
-// });
+var webSocket = {};
 
-// Create the dock menu template
-
-const pipePath = "/tmp/electron_pipe";
-
-function receiveMessageFromPip() {
-    console.log("receiveMessageFromPip....");
-    fs.createReadStream(pipePath, { encoding: "utf8" }).on("data", (data) => {
-        console.log("Received message:", data);
-        receiveMessageFromPip();
-        createWindow(data);
-    });
+// websocket
+async function retryWebsocketConnection() {
+    let timer = setTimeout(async () => {
+        if (webSocket.readyState !== WebSocket.OPEN) {
+            clearTimeout(timer);
+            try {
+                await webSocketManager();
+            } catch (error) {
+                console.log("This could be an expected exception:", error);
+                return [];
+            }
+        }
+    }, 2000);
 }
 
-// Additional setup for your Electron app
+function handleMessage(message) {
+    switch (message.type[1]) {
+        case "newWindow":
+            createWindow(message.type[2])
+            break;
+        default:
+            break;
+    }
+}
+
+const options = {
+    rejectUnauthorized: false, // Bypass SSL certificate verification
+};
+
+const agent = new https.Agent(options);
+
+async function webSocketManager() {
+    try {
+        const wsUrl = "wss://127.0.0.1:8999/ws/varchive/app/1";
+        webSocket = new WebSocket(wsUrl, { agent });
+        webSocket.onopen = async (event) => {};
+        webSocket.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            console.log("message:", message);
+            handleMessage(message);
+        };
+        webSocket.onclose = (event) => {
+            retryWebsocketConnection();
+        };
+    } catch (error) {
+        retryWebsocketConnection();
+    }
+}
+
+// Additional setup for Electron app
 
 const dockMenuTemplate = [
     {
@@ -83,16 +118,16 @@ async function curl(path, jsonStr) {
                 returnCode: 0,
                 stdout: stdout,
             };
-            return stdout;
         })
         .catch(async ({ error, stderr }) => {
-            const options = {
-                type: "error",
-                message: `${installPath}`,
-                detail: `${stderr}`,
-                buttons: ["OK"],
-            };
-            await dialog.showMessageBox(options);
+            console.log("Error: curl: ", stderr);
+            // const options = {
+            //     type: "error",
+            //     message: `${curlCmd}`,
+            //     detail: `${stderr}`,
+            //     buttons: ["OK"],
+            // };
+            // await dialog.showMessageBox(options);
             return { returnCode: 1 };
         });
 }
@@ -222,13 +257,13 @@ function setDockMenu() {
 
 app.whenReady().then(async () => {
     setDockMenu();
-    receiveMessageFromPip();
     const res = await checkInstall();
     if (res !== 0) {
         app.quit();
     } else {
         await startServer();
         await cancelShutdown();
+        await webSocketManager();
         if (args.length > 0) {
             createWindow(args[0]);
         } else {

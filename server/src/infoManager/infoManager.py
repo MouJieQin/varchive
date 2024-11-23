@@ -15,6 +15,7 @@ class IINAinfoManager(IINAbookmarkManager):
         broadcastToIinas: Callable,
         broadcastToVarchives: Callable,
         putMessageToBroadcastVarchives: Callable,
+        wsApp: Callable,
         messageQueue: messageQueue.MessageQueue,
         ResourceMap: ResourceMapManager,
     ):
@@ -28,6 +29,7 @@ class IINAinfoManager(IINAbookmarkManager):
             messageQueue,
             ResourceMap,
         )
+        self.wsApp = wsApp
         self.previewWebpOutputPaths = []
         self.__initData()
 
@@ -143,7 +145,22 @@ class IINAinfoManager(IINAbookmarkManager):
                 "error", currentURL, "Not Varchived yet.", currentURL, 3
             )
             await self.sendText(message)
-        self.ResourceMap.openInVarchivebyMetaFilename(metaFilename)
+            return
+        allURL = self.ResourceMap.getAllURLbyMetaFilename(metaFilename)
+        if not self.wsApp()["status"]:
+            self.ResourceMap.SystemRunner.put(["open", allURL])
+        else:
+            self.wsApp()["sendTextToApp"](
+                json.dumps(
+                    {
+                        "type": [
+                            "app",
+                            "newWindow",
+                            allURL,
+                        ]
+                    }
+                )
+            )
 
     async def handleMessage(self):
         if self.type[1] == "bookmarks":

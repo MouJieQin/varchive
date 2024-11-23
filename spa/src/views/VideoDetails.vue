@@ -692,7 +692,6 @@ export default {
                         }
                     }
                     this.videoInfo = JSON.parse(message.message)
-                    console.log("this.videoInfo:", this.videoInfo)
                     break;
                 default:
                     break;
@@ -773,11 +772,11 @@ export default {
                 const message = JSON.parse(event.data)
                 this.handleMessage(message)
             }
-            this.webSocket.onclose = (event) => {
+            this.webSocket.onclose = async (event) => {
                 this.connection = "closed"
                 if (!this.isBeforeUnmount) {
                     this.showElNotification('Warning', 'Cannot connect to server. Retrying ...', 'warning')
-                    this.retryWebsocketConnection()
+                    await this.retryWebsocketConnection()
                 }
             }
         },

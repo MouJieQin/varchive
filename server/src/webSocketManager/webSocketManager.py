@@ -36,6 +36,8 @@ class WebSocketManager:
             None for i in range(0, self.maxConnection)
         ]
 
+        self.activeAppConnection: WebSocket = None
+
         self.sendTextToIinaLocks: List[asyncio.Lock] = [
             asyncio.Lock() for i in range(0, self.maxConnection)
         ]
@@ -45,6 +47,7 @@ class WebSocketManager:
         ]
 
         self.messagesToVarchive: List[List] = [[] for i in range(0, self.maxConnection)]
+        self.messagesToApp: List = []
 
         self.messagesFromIina: list[MessageQueue] = [
             MessageQueue(self.maxMessage) for i in range(0, self.maxConnection)
@@ -80,7 +83,7 @@ class WebSocketManager:
         manageVIconnectionThread.start()
 
         def run_async_task():
-            asyncio.run(self.sendMessageFromDequeToVarchive())
+            asyncio.run(self.sendMessageFromDequeToClients())
 
         manageSendMessageThread = threading.Thread(target=run_async_task)
         manageSendMessageThread.daemon = True
@@ -109,12 +112,32 @@ class WebSocketManager:
     async def sendTextToVarchive(self, ID: int, text: str):
         self.messagesToVarchive[ID].append(text)
 
-    async def sendMessageFromDequeToVarchive(self):
+    async def sendTextToAppImple(self, text: str):
+        try:
+            if self.activeAppConnection != None:
+                await self.activeAppConnection.send_text(text)
+        except Exception as e:
+            print(f"An error occurred while sending text to App: {e}")
+            self.disconnectApp()
+
+    def sendTextToApp(self, text: str) -> bool:
+        self.messagesToApp.append(text)
+
+    def wsApp(self) -> Dict[str, any]:
+        return {
+            "status": self.activeAppConnection != None,
+            "sendTextToApp": self.sendTextToApp,
+        }
+
+    async def sendMessageFromDequeToClients(self):
         while True:
             for id in range(0, self.maxConnection):
                 while len(self.messagesToVarchive[id]) != 0:
                     message = self.messagesToVarchive[id].pop(0)
                     await self.sendTextToVarchiveImple(id, message)
+                while len(self.messagesToApp) != 0:
+                    message = self.messagesToApp.pop(0)
+                    await self.sendTextToAppImple(message)
             await self.sleep()
 
     def putMessageToVarchive(self, ID: int, text: str):
@@ -241,6 +264,15 @@ class WebSocketManager:
             )
         )
 
+    async def connectApp(self, ID: int, websocket: WebSocket):
+        await websocket.accept()
+        self.activeAppConnection = websocket
+        print(
+            "WebSocketManager: The connection whose ID is [{}] from [App] open.".format(
+                ID
+            )
+        )
+
     async def updateVideoStatisticsWhenDisconnnect(self, ID: int, currentURL: str):
         metaPath = self.ResourceMap.getMetaPathByURL(currentURL)
         if not metaPath or not os.path.exists(metaPath):
@@ -303,6 +335,9 @@ class WebSocketManager:
                 ID
             )
         )
+
+    def disconnectApp(self, ID: int):
+        self.activeAppConnection = None
 
     async def disconnectAll(self):
         for id in range(0, self.maxConnection):
@@ -424,6 +459,7 @@ class WebSocketManager:
                     lambda text: self.broadcastToIinasByMetaPath(metaPath, text),
                     lambda text: self.broadcastToVarchivesByMetaPath(metaPath, text),
                     lambda text: self.putMessageToBroadcastVarchives(metaPath, text),
+                    self.wsApp,
                     messages,
                     self.ResourceMap,
                 )
@@ -431,6 +467,9 @@ class WebSocketManager:
         else:
             # Never happen
             pass
+
+    async def handleMessageFromApp(text: str):
+        print(text)
 
     async def handleMessageFromVarchive(
         self, ID: int, text: str, messages: MessageQueue, websocket: WebSocket
@@ -495,7 +534,12 @@ class WebSocketManager:
                 varchiveVideoID, text, messages, websocket
             )
 
-    async def sendMessageToIina(self, iinaID: int, websocket: WebSocket):
+    async def receiveMessageFromApp(self, websocket: WebSocket):
+        while self.activeAppConnection != None:
+            text = await websocket.receive_text()
+            await self.handleMessageFromApp(text)
+
+    async def sendMessageToIina(self, iinaID: int):
         while self.isIinaConnected(iinaID):
             while self.idMapFromIinaToVarchiveVideo[iinaID] == -1:
                 await self.sleep()
@@ -515,9 +559,7 @@ class WebSocketManager:
             else:
                 await self.sleep()
 
-    async def sendMessageToVarchiveVideoDetails(
-        self, varchiveVideoID: int, websocket: WebSocket
-    ):
+    async def sendMessageToVarchiveVideoDetails(self, varchiveVideoID: int):
         while self.isVarchiveConnected(varchiveVideoID):
             while self.idMapFromVarchiveVideoToIina[varchiveVideoID] == -1:
                 await self.sleep()

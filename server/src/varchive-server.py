@@ -149,15 +149,12 @@ async def websocketEndpointIINA(websocket: WebSocket, clientID: int):
     WebsocketManager.messagesFromIina[clientID].clear()
     try:
         tasks_list = [
-            asyncio.create_task(
-                WebsocketManager.sendMessageToIina(clientID, websocket)
-            ),
+            asyncio.create_task(WebsocketManager.sendMessageToIina(clientID)),
             asyncio.create_task(
                 WebsocketManager.receiveMessageFromIina(clientID, websocket)
             ),
         ]
         await asyncio.gather(*tasks_list)
-
     except WebSocketDisconnect:
         await WebsocketManager.sendDispairedInfoToVarchiveByIinaID(clientID)
         await WebsocketManager.disconnectIina(clientID)
@@ -170,7 +167,7 @@ async def websocketEndpointVarchive(websocket: WebSocket, clientID: int):
     try:
         tasks_list = [
             asyncio.create_task(
-                WebsocketManager.sendMessageToVarchiveVideoDetails(clientID, websocket)
+                WebsocketManager.sendMessageToVarchiveVideoDetails(clientID)
             ),
             asyncio.create_task(
                 WebsocketManager.receiveMessageFromVarchiveVideoDetails(
@@ -181,6 +178,18 @@ async def websocketEndpointVarchive(websocket: WebSocket, clientID: int):
         await asyncio.gather(*tasks_list)
     except WebSocketDisconnect:
         WebsocketManager.disconnectVarchive(clientID)
+
+
+@app.websocket("/ws/varchive/app/{clientID}")
+async def websocketEndpointApp(websocket: WebSocket, clientID: int):
+    await WebsocketManager.connectApp(clientID, websocket)
+    try:
+        tasks_list = [
+            asyncio.create_task(WebsocketManager.receiveMessageFromApp(websocket)),
+        ]
+        await asyncio.gather(*tasks_list)
+    except WebSocketDisconnect:
+        WebsocketManager.disconnectApp(clientID)
 
 
 class ListFiles(BaseModel):
@@ -372,6 +381,7 @@ async def signal_handler(sig, frame):
     videoEditing.PQueue.cancelAll()
     await WebsocketManager.disconnectAll()
     time.sleep(1)
+    print("Exited")
 
 
 def handle_signal(sig, frame):

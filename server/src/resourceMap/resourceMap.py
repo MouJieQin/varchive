@@ -43,15 +43,15 @@ class RecentManager:
     def getRecentList(self):
         return [name for name in self.recentList]
 
-    def openInVarchivebyMetaFilename(self, metaFilename: str):
-        if metaFilename not in self.metaMapRecentName.keys():
-            return
-        recentName = self.metaMapRecentName[metaFilename]
-        recentPath = self.__getRecentPathByRecentName(recentName)
-        if not os.path.exists(recentPath):
-            return
-        recentURL = self.recentURL + "/" + recentName + "/details"
-        self.SystemRunner.put(["open", recentURL])
+    # def openInVarchivebyMetaFilename(self, metaFilename: str):
+    #     if metaFilename not in self.metaMapRecentName.keys():
+    #         return
+    #     recentName = self.metaMapRecentName[metaFilename]
+    #     recentPath = self.__getRecentPathByRecentName(recentName)
+    #     if not os.path.exists(recentPath):
+    #         return
+    #     recentURL = self.recentURL + "/" + recentName + "/details"
+    #     self.SystemRunner.put(["open", recentURL])
 
     def __popByRecentName(self, recenName: str):
         # recentName may already be renamed by user
@@ -128,6 +128,9 @@ class ResourceMapManager:
         self.ArchivesPath = FILE_MANAGER_ABS_PATH + "/video/Archives"
         self.RecentPath = FILE_MANAGER_ABS_PATH + "/video/Recent"
         self.recentURL = "http://{}:{}/video/Recent".format(
+            self.Config["varchive"]["host"], self.Config["varchive"]["port"]
+        )
+        self.allURL = "http://{}:{}/video/All".format(
             self.Config["varchive"]["host"], self.Config["varchive"]["port"]
         )
         ResourceMapManager.createDirIfnotExists(self.metaPath)
@@ -230,8 +233,8 @@ class ResourceMapManager:
             details = json.load(f)
         self.recentManager.push(details["title"], metaFilename)
 
-    def openInVarchivebyMetaFilename(self, metaFilename: str):
-        self.recentManager.openInVarchivebyMetaFilename(metaFilename)
+    def getAllURLbyMetaFilename(self, metaFilename: str):
+        return self.allURL + "/" + metaFilename + "/details"
 
     def __syncToFile(self):
         with open(self.resourceMapPath, mode="w", encoding="utf-8") as f:

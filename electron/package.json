@@ -15,7 +15,8 @@
     "electron:build": "vite build && electron-builder && ./electron/moveFiles.sh"
   },
   "dependencies": {
-    "vue": "^3.5.12"
+    "vue": "^3.5.12",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.4",

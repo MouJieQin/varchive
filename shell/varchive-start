@@ -15,6 +15,16 @@ fi
 if ! ps -ef | grep varchive-server.py | grep -v grep; then
     cd "$SCRIPT_DIR/../server/src"
     nohup python3.9 varchive-server.py >>/tmp/varchive-server.log 2>&1 &
+    TOTAL=5
+    count=0
+    while ! curl https://127.0.0.1:8999/filemanager >/dev/null 2>&1; do
+        ((count++))
+        if [ $count -ge $TOTAL ]; then
+            echo "Failed: python3.9 varchive-server.py!" 1>&2
+            exit 1
+        fi
+        sleep 1
+    done
     cd - >/dev/null
 fi
 
