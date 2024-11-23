@@ -743,26 +743,6 @@ export default {
             }
             const wsUrl = config.wsServer.concat('/', id)
             this.webSocket = new WebSocket(wsUrl)
-            switch (this.webSocket.readyState) {
-                case WebSocket.CONNECTING:
-                    // do something
-                    console.log("CONNECTING...")
-                    break;
-                case WebSocket.OPEN:
-                    console.log("OPEN...")
-                    break;
-                case WebSocket.CLOSING:
-                    // do something
-                    console.log("CLOSING...")
-                    break;
-                case WebSocket.CLOSED:
-                    // do something
-                    console.log("CLOSED...")
-                    break;
-                default:
-                    // this never happens
-                    break;
-            }
             this.webSocket.onopen = async (event) => {
                 this.connection = "serverConnected"
                 // this.showElNotification('Success', 'Connected with server.', 'success')

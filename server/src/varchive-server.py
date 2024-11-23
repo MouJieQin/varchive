@@ -203,17 +203,15 @@ async def videoListDir(request: Request, path: str = ""):
     return ListFiles(fileStatusCode=res[0], fileList=res[1])
 
 
-class RealDetailsPath(BaseModel):
-    videoPath: str = ""
-
-
-@app.get("/filemanager/realpath", response_model=RealDetailsPath)
+@app.get("/filemanager/realpath")
 async def getRealVideoPath(request: Request, path: str = ""):
     realPath = FILE_MANAGER_ABS_PATH + path
-    if ResourceMap.isVarchiveVideoLink(realPath):
+    if ResourceMap.isValidVarchiveVideoLink(realPath):
         ResourceMap.addVideoPathIfAvailable(realPath)
         path = "/" + ResourceMap.getMetaRelPathByLinkDir(realPath)
-    return RealDetailsPath(videoPath=path)
+        return {"videoPath": path}
+    else:
+        return {"videoPath": ""}
 
 
 class VarchiveLinkDir(BaseModel):

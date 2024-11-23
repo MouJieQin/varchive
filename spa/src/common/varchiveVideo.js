@@ -77,6 +77,11 @@ export const loadVideoInfo = async (path) => {
         }
         const resJson = await response.json();
         videoPath = resJson.videoPath;
+        if (videoPath === "") {
+            return {
+                returnCode: 1,
+            };
+        }
     } catch (error) {
         console.log("Request Failed:", error);
         return {
