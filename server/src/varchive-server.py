@@ -375,6 +375,7 @@ async def parseSubtitle(request: Request, path: str = ""):
 async def signal_handler(sig, frame):
     await WebsocketManager.disconnectAll()
 
+
 def handle_signal(sig, frame):
     print("Received quit signal. Exiting...")
     videoEditing.PQueue.cancelAll()
