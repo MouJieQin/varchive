@@ -100,29 +100,31 @@
                         </el-icon>
                     </h2>
                     <div v-show="!isHideBookmarks">
-                        <el-input v-model="bookmarkPattern" clearable
-                            style="max-width: 600px;margin-bottom: 10px;float:right">
-                            <template #append>
-                                <el-icon>
-                                    <Search />
-                                </el-icon>
-                            </template>
-                        </el-input>
-                        <div style="clear:both; margin-bottom: 15px;">
-                            <el-button-group class="ml-4">
-                                <el-button v-show="!isPlayBookmarks" :icon="VideoPlayRaw"
-                                    @click="isPlayBookmarks = true">
-                                </el-button>
-                                <el-button v-show="isPlayBookmarks" :icon="VideoPauseRaw"
-                                    @click="isPlayBookmarks = false">
-                                </el-button>
-                                <el-button :icon="DeleteRaw" @click="clearBookmarks">
-                                </el-button>
-                                <el-button v-show="!isWebpsOnly" :icon="GridRaw" @click="isWebpsOnly = true">
-                                </el-button>
-                                <el-button v-show="isWebpsOnly" :icon="ListRaw" @click="isWebpsOnly = false">
-                                </el-button>
-                            </el-button-group>
+                        <div style="margin-bottom: 30px;">
+                            <el-input v-model="bookmarkPattern" clearable
+                                style="max-width: 600px;margin-bottom: 10px;float:right">
+                                <template #append>
+                                    <el-icon>
+                                        <Search />
+                                    </el-icon>
+                                </template>
+                            </el-input>
+                            <div style="margin-bottom: 15px;">
+                                <el-button-group class="ml-4">
+                                    <el-button v-show="!isPlayBookmarks" :icon="VideoPlayRaw"
+                                        @click="isPlayBookmarks = true">
+                                    </el-button>
+                                    <el-button v-show="isPlayBookmarks" :icon="VideoPauseRaw"
+                                        @click="isPlayBookmarks = false">
+                                    </el-button>
+                                    <el-button :icon="DeleteRaw" @click="clearBookmarks">
+                                    </el-button>
+                                    <el-button v-show="!isWebpsOnly" :icon="GridRaw" @click="isWebpsOnly = true">
+                                    </el-button>
+                                    <el-button v-show="isWebpsOnly" :icon="ListRaw" @click="isWebpsOnly = false">
+                                    </el-button>
+                                </el-button-group>
+                            </div>
                         </div>
                         <div v-show="isWebpsOnly">
                             <WebpPreview v-for="bookmark in this.bookmarkInfo.bookmarks"
@@ -153,19 +155,21 @@
                         </el-icon>
                     </h2>
                     <div v-show="!isHideSubtitles">
-                        <el-input v-model="subPattern" clearable style="max-width: 600px;float:right">
-                            <template #append>
-                                <el-icon>
-                                    <Search />
-                                </el-icon>
-                            </template>
-                        </el-input>
-                        <el-button v-show="isStopAutoScrollSub" :icon="RefreshLeftRaw"
-                            @click="isStopAutoScrollSub = false" style="clear:both">
-                        </el-button>
-                        <SubtitleSelector :loadedSubtitles="this.playerMessage.loadedSubtitles"
-                            :subtitleInfoes="this.subtitleInfoes" :subShowing="this.subShowing"
-                            :setSubtitleInfoes="this.setSubtitleInfoes" :setSubShowing="this.setSubShowing" />
+                        <div>
+                            <el-input v-model="subPattern" clearable style="max-width: 600px;float:right">
+                                <template #append>
+                                    <el-icon>
+                                        <Search />
+                                    </el-icon>
+                                </template>
+                            </el-input>
+                            <el-button v-show="isStopAutoScrollSub" :icon="RefreshLeftRaw"
+                                @click="isStopAutoScrollSub = false" style="clear:both">
+                            </el-button>
+                            <SubtitleSelector :loadedSubtitles="this.playerMessage.loadedSubtitles"
+                                :subtitleInfoes="this.subtitleInfoes" :subShowing="this.subShowing"
+                                :setSubtitleInfoes="this.setSubtitleInfoes" :setSubShowing="this.setSubShowing" />
+                        </div>
                         <div class="scroll-container" id="subtitle-scroll-container" @scroll="handleScroll"
                             @mouseover="this.isStopAutoScrollSub = true; this.isSubtitleMouseOver = true"
                             @mouseout="this.isSubtitleMouseOver = false">

@@ -385,6 +385,7 @@ body {
 /* bookmarks */
 .bookmarks {
     clear: both;
+    margin-top: 40px;
 }
 
 .bookmarks img {
@@ -462,8 +463,9 @@ body {
 /* subtitle */
 .subtitles {
     clear: both;
+    margin-top: 40px;
     align-items: center;
-    margin-bottom: 40px;
+    /* margin-bottom: 40px; */
 }
 
 .subtitles .subtitle {
@@ -498,5 +500,6 @@ body {
 /* statistic */
 .statistics {
     clear: both;
+    margin-top: 70px;
     align-items: center;
 }

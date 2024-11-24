@@ -32,7 +32,7 @@ export default {
                 title: {
                     left: '3%',
                     top: '5%',
-                    padding: ['10%', '10%', '10%', '10%'],
+                    // padding: ['10%', '10%', '10%', '10%'],
                     text: "",// support \n 
                 },
                 // tooltip: {
