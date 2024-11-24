@@ -133,6 +133,7 @@ class IINAinfoManager(IINAbookmarkManager):
 
     async def __handleInfoWithoutPreview(self):
         await self.__initDetails()
+        await self.__handleOpenInVarchive()
         self.__handleGenCover()
         self.__putDetailsMessageForVarchive()
 

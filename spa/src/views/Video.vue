@@ -118,7 +118,6 @@ export default {
             }
             for (var i = 0, len = this.lastFolders.length; i < len; ++i) {
                 const filename = this.lastFolders[i].filename
-                console.error(`"filename${filename}"`)
                 const childName = currRouterName.concat("/", filename)
                 this.dirs[filename] = childName
                 this.$router.addRoute(currRouterName,

@@ -99,7 +99,6 @@ class WebSocketManager:
             print(f"An error occurred while sending text to IINA[{ID}]: {e}")
             await self.sendDispairedInfoToVarchiveByIinaID(ID)
             await self.disconnectIina(ID)
-    
 
     async def sendTextToVarchiveImple(self, ID: int, text: str):
         try:
@@ -548,7 +547,7 @@ class WebSocketManager:
                 )
             except Exception as e:
                 print(
-                    "This exception may be normal because the connection to varchive is closed.{}".format(
+                    "This exception when receiving may be normal because the connection to varchive is closed.{}".format(
                         e
                     )
                 )
@@ -569,7 +568,10 @@ class WebSocketManager:
 
     async def sendMessageToIina(self, iinaID: int):
         while self.isIinaConnected(iinaID):
-            while self.idMapFromIinaToVarchiveVideo[iinaID] == -1:
+            while (
+                self.isIinaConnected(iinaID)
+                and self.idMapFromIinaToVarchiveVideo[iinaID] == -1
+            ):
                 await self.sleep()
             varchiveVideoID = self.idMapFromIinaToVarchiveVideo[iinaID]
             messages = self.messagesFromVarchiveVideo[varchiveVideoID]
@@ -590,7 +592,10 @@ class WebSocketManager:
 
     async def sendMessageToVarchiveVideoDetails(self, varchiveVideoID: int):
         while self.isVarchiveConnected(varchiveVideoID):
-            while self.idMapFromVarchiveVideoToIina[varchiveVideoID] == -1:
+            while (
+                self.isVarchiveConnected(varchiveVideoID)
+                and self.idMapFromVarchiveVideoToIina[varchiveVideoID] == -1
+            ):
                 await self.sleep()
             iinaID = self.idMapFromVarchiveVideoToIina[varchiveVideoID]
             messages = self.messagesFromIina[iinaID]
@@ -600,7 +605,7 @@ class WebSocketManager:
                     await self.sendTextToVarchive(varchiveVideoID, message)
                 except Exception as e:
                     print(
-                        "This exception may be normal because the connection to varchive is closed.{}".format(
+                        "This exception when sending may be normal because the connection to varchive is closed.{}".format(
                             e
                         )
                     )

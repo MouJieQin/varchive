@@ -176,14 +176,6 @@ async def websocketEndpointVarchive(websocket: WebSocket, clientID: int):
         await asyncio.gather(*tasks_list)
     except WebSocketDisconnect:
         WebsocketManager.disconnectVarchive(clientID)
-    except asyncio.CancelledError:
-        print("Async task was cancelled.")
-    except asyncio.exceptions.CancelledError:
-        print("Async task was cancelled.")    
-    except Exception as e:
-        print(
-            f"/ws/varchive/video/details/: An error occurred while sending text to: {e}"
-        )
 
 
 @app.websocket("/ws/varchive/app/{clientID}")
@@ -381,15 +373,14 @@ async def parseSubtitle(request: Request, path: str = ""):
 
 
 async def signal_handler(sig, frame):
-    print("Received quit signal. Exiting...")
-    videoEditing.PQueue.cancelAll()
     await WebsocketManager.disconnectAll()
-    time.sleep(1)
-    print("Exited")
-
 
 def handle_signal(sig, frame):
+    print("Received quit signal. Exiting...")
+    videoEditing.PQueue.cancelAll()
     asyncio.ensure_future(signal_handler(sig, frame))
+    time.sleep(1)
+    print("Exited")
 
 
 if __name__ == "__main__":
