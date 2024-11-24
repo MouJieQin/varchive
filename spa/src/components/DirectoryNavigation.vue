@@ -1,5 +1,5 @@
 <template>
-    <div class="dir-nav" tabindex="-1" @keydown="checkKeyDown" @keyup="checkKeyUp">
+    <div v-show="isShow" class="dir-nav" tabindex="-1" @keydown="checkKeyDown" @keyup="checkKeyUp">
         <router-link v-for="folder in this.folders" :id="this.dirs[folder.filename]" :class="folder.type"
             :key="this.dirs[folder.filename]" @click="dirUpdate" @keydown="checkKeyDown" @keyup="checkKeyUp"
             @mouseover="mouseOverRouterLink = this.dirs[folder.filename]" @mouseout="mouseOverRouterLink = ''"
@@ -32,6 +32,7 @@ export default {
     },
     components: { Covers },
     computed: {
+        isShow() { return this.$route.path !== "/video/Recent" && !this.$route.path.startsWith("/video/All") },
         hasRoute() {
             return this.dirs.length == 0
         }

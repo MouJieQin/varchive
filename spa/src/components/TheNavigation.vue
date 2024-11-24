@@ -1,6 +1,8 @@
 <template>
     <div id="navigation">
-        <a id="logo" href="/video/All"><Logo /></a>
+        <a id="logo" href="/video/All">
+            <Logo />
+        </a>
         <router-link :to="{ name: 'video' }">Video</router-link>
         <a href="" @click.prevent=" shutdownDialogVisible = true">Backend</a>
         <a href="https://github.com/MouJieQin/varchive" target="_blank">Github</a>

@@ -91,7 +91,7 @@ export default {
                 const response = await fetch(url)
                 const resJson = await response.json()
                 this.fileStatusCode = resJson["fileStatusCode"]
-                this.lastFolders = resJson["fileList"]
+                this.lastFolders = resJson["fileList"].filter((folder) => { return folder.filename !== ".DS_Store" })
                 switch (this.fileStatusCode) {
                     case -1:
                         throw new Error(currRouterName + " not exists!");
@@ -117,11 +117,13 @@ export default {
                 return -1
             }
             for (var i = 0, len = this.lastFolders.length; i < len; ++i) {
-                const childName = currRouterName.concat("/", this.lastFolders[i].filename)
-                this.dirs[this.lastFolders[i].filename] = childName
+                const filename = this.lastFolders[i].filename
+                console.error(`"filename${filename}"`)
+                const childName = currRouterName.concat("/", filename)
+                this.dirs[filename] = childName
                 this.$router.addRoute(currRouterName,
                     {
-                        path: this.lastFolders[i].filename,
+                        path: filename,
                         name: childName,
                         component: () => import('@/components/DirectoryNavigation.vue'),
                         props: route => ({ ...route.params })
