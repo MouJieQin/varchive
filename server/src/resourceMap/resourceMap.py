@@ -309,7 +309,7 @@ class ResourceMapManager:
         localVideoPath = self.getLocalVideoPathByLinkDir(path)
         if not os.path.exists(localVideoPath):
             return
-        videoURL = self.localFileHeader + localVideoPath
+        videoURL = self.localFileHeader + os.path.realpath(localVideoPath)
         metaPath = self.getMetaPathByLinkDir(path)
         detailsPath = self.getDetailsPath(metaPath)
         details = {}
@@ -324,9 +324,6 @@ class ResourceMapManager:
             for i in reversed(indexes):
                 path.pop(i)
             path.insert(0, {"url": videoURL, "isSelected": True})
-        for url in path:
-            if url["url"] in self.infoUsing:
-                self.infoUsing[url["url"]]["path"] = path
         with open(detailsPath, mode="w", encoding="utf-8") as f:
             f.write(json.dumps(details, ensure_ascii=False, indent=4))
 
