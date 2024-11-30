@@ -208,7 +208,9 @@ class VarchiveInfoManager(VarchiveBookmarkManager):
                 self.infoJson = self.ResourceMap.infoUsing[self.detailsPath]
 
     async def __sendEditingErrorToVarchive(self, errorMessage: str):
-        await self._sendDetailsMessageForVarchive("editing-error")
+        await self._sendDetailsMessageForVarchive(
+            "editing-error", isBroadcast=False, message=errorMessage
+        )
 
     async def __syncEditedInformation(self):
         self._syncInfoToFile()

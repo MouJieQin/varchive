@@ -108,11 +108,11 @@ class BookmarkManager:
             f.write(json.dumps(self.infoJson, ensure_ascii=False, indent=4))
 
     async def _sendDetailsMessageForVarchive(
-        self, type: str, isBroadcast: bool = False
+        self, type: str, isBroadcast: bool = False, message: str = ""
     ):
         detailsInfo = {
             "type": ["varchive", "details", type],
-            "message": json.dumps(self.infoJson),
+            "message": json.dumps(self.infoJson) if not message else message,
         }
         try:
             if isBroadcast:
