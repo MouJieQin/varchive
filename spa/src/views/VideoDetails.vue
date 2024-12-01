@@ -52,42 +52,8 @@
                     <el-input v-else v-model="this.infoEditing.info" autosize type="textarea"
                         style="margin-bottom: 10px;" placeholder="Please input more information" />
                 </section>
-                <section id="previews" class="previews">
-                    <h2 @mouseover="isMouseOverPreview = true" @mouseout="isMouseOverPreview = false">Previews
-                        <el-icon v-show="isMouseOverPreview && isHidePreview" class="icon" style="margin-left: 8px">
-                            <View @click="isHidePreview = false" />
-                        </el-icon>
-                        <el-icon v-show="isMouseOverPreview && !isHidePreview" class="icon" style="margin-left: 8px">
-                            <Hide @click="isHidePreview = true" />
-                        </el-icon>
-                    </h2>
-                    <div v-show="!isHidePreview">
-                        <el-button-group class="ml-4" style="margin-bottom: 15px;">
-                            <el-button v-show="!isPlayPreview" :icon="VideoPlayRaw" @click="isPlayPreview = true">
-                            </el-button>
-                            <el-button v-show="isPlayPreview" :icon="VideoPauseRaw" @click="isPlayPreview = false">
-                            </el-button>
-                            <el-popconfirm confirm-button-text="Delete" cancel-button-text="No" :icon="WarningFilledRaw"
-                                icon-color="#E6A23C" title="Delete all clips?" @confirm="deletePreviews" @cancel="">
-                                <template #reference>
-                                    <el-button :icon="DeleteRaw">
-                                    </el-button>
-                                </template>
-                            </el-popconfirm>
-                            <el-popconfirm confirm-button-text="Yes" cancel-button-text="No" icon-color="#909399"
-                                title="Generate clips?" @confirm="generatePreview" @cancel="">
-                                <template #reference>
-                                    <el-button :icon="FilmRaw">
-                                    </el-button>
-                                </template>
-                            </el-popconfirm>
-                        </el-button-group>
-                        <div>
-                            <WebpPreview v-for="clip in clips" @click="seekTo(clip.startTime)" :key="clip"
-                                :webpPath="this.webpPath" :clip="clip" :isPlay="isPlayPreview" />
-                        </div>
-                    </div>
-                </section>
+                <Preview :webpPath="webpPath" :videoInfo="videoInfo" :getMessageToServer="getMessageToServer"
+                    :sendMessage="sendMessage" :seekTo="seekTo" />
                 <br style="clear:both" />
                 <section id="bookmarks" class="bookmarks">
                     <h2 @mouseover="isMouseoverBookmarks = true" @mouseout="isMouseoverBookmarks = false">Bookmarks
@@ -199,6 +165,7 @@ import Bookmark from '@/components/Bookmark.vue'
 import Subtitle from '@/components/Subtitle.vue'
 import SubtitleSelector from '@/components/SubtitleSelector.vue'
 import VideoURL from '@/components/VideoURL.vue'
+import Preview from '@/views/Preview.vue'
 import Anchor from '@/views/Anchor.vue'
 import VideoStatisticsShow from '@/views/VideoStatisticsShow.vue'
 import { loadVideoInfo } from '@/common/varchiveVideo.js'
@@ -263,7 +230,7 @@ export default {
             statistics: {},
         }
     },
-    components: { Anchor, Search, Refresh, CircleCheck, CircleCheckFilled, WarningFilled, Edit, Delete, RefreshLeft, Check, Close, View, Hide, VideoPlay, VideoPause, Film, Grid, List, WebpPreview, Bookmark, Subtitle, SubtitleSelector, VideoURL, VideoStatisticsShow },
+    components: { Anchor, Preview, Search, Refresh, CircleCheck, CircleCheckFilled, WarningFilled, Edit, Delete, RefreshLeft, Check, Close, View, Hide, VideoPlay, VideoPause, Film, Grid, List, WebpPreview, Bookmark, Subtitle, SubtitleSelector, VideoURL, VideoStatisticsShow },
 
     watch: {
         videoPos(newVideoPos, oldVideoPos) {
@@ -802,7 +769,5 @@ export default {
         document.title = "Varchive"
     },
 }
-
-
 
 </script>
