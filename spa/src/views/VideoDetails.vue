@@ -22,47 +22,14 @@
                 <Preview :webpPath="webpPath" :videoInfo="videoInfo" :getMessageToServer="getMessageToServer"
                     :sendMessage="sendMessage" :seekTo="seekTo" />
                 <br style="clear:both" />
-                <Bookmarks :setIsBookmarksMouseOver="(val) => { isBookmarksMouseOver = val }" :clearBookmarks="clearBookmarks"
-                    :bookmarkInfo="bookmarkInfo" :seekTo="seekTo" :removeBookmark="removeBookmark"
-                    :highlightTextWithMatch="highlightTextWithMatch" :editBookmark="editBookmark"
-                    :webpPath="webpPath" />
+                <Bookmarks :setIsBookmarksMouseOver="(val) => { isBookmarksMouseOver = val }"
+                    :clearBookmarks="clearBookmarks" :bookmarkInfo="bookmarkInfo" :seekTo="seekTo"
+                    :removeBookmark="removeBookmark" :highlightTextWithMatch="highlightTextWithMatch"
+                    :editBookmark="editBookmark" :webpPath="webpPath" />
                 <br style="clear:both" />
-                <section id="subtitles" class="subtitles">
-                    <h2 @mouseover="isMouseoverSubtitles = true" @mouseout="isMouseoverSubtitles = false">Subtitle
-                        <el-icon v-show="isMouseoverSubtitles && isHideSubtitles" class="icon" style="margin-left: 8px">
-                            <View @click="isHideSubtitles = false" />
-                        </el-icon>
-                        <el-icon v-show="isMouseoverSubtitles && !isHideSubtitles" class="icon"
-                            style="margin-left: 8px">
-                            <Hide @click="isHideSubtitles = true" />
-                        </el-icon>
-                    </h2>
-                    <div v-show="!isHideSubtitles">
-                        <div>
-                            <el-input v-model="subPattern" clearable style="max-width: 600px;float:right">
-                                <template #append>
-                                    <el-icon>
-                                        <Search />
-                                    </el-icon>
-                                </template>
-                            </el-input>
-                            <el-button v-show="isStopAutoScrollSub" :icon="RefreshLeftRaw"
-                                @click="isStopAutoScrollSub = false" style="clear:both">
-                            </el-button>
-                            <SubtitleSelector :loadedSubtitles="this.playerMessage.loadedSubtitles"
-                                :subtitleInfoes="this.subtitleInfoes" :subShowing="this.subShowing"
-                                :setSubtitleInfoes="this.setSubtitleInfoes" :setSubShowing="this.setSubShowing" />
-                        </div>
-                        <div class="scroll-container" id="subtitle-scroll-container" @scroll="handleScroll"
-                            @mouseover="this.isStopAutoScrollSub = true; this.isSubtitleMouseOver = true"
-                            @mouseout="this.isSubtitleMouseOver = false">
-                            <Subtitle v-for="subtitleInfo in subtitleInfoes" :key="subtitleInfo"
-                                :id="`${this.subShowing}-${subtitleInfo.startTimeFormat}`" :subtitleInfo="subtitleInfo"
-                                :subPattern="subPattern" :highlightTextWithMatch="highlightTextWithMatch"
-                                :seekTo="seekTo" />
-                        </div>
-                    </div>
-                </section>
+                <Subtitles :subPageInfo="subPageInfo" :playerMessage="playerMessage" :subtitleInfoes="subtitleInfoes"
+                    :subShowing="subShowing" :setSubtitleInfoes="setSubtitleInfoes" :setSubShowing="setSubShowing"
+                    :highlightTextWithMatch="highlightTextWithMatch" :seekTo="seekTo" />
                 <section id="statistics" class="statistics">
                     <h2 @mouseover="isMouseoverStatistics = true" @mouseout="isMouseoverStatistics = false">Statistics
                     </h2>
@@ -83,8 +50,9 @@ import Subtitle from '@/components/Subtitle.vue'
 import SubtitleSelector from '@/components/SubtitleSelector.vue'
 import VideoURL from '@/components/VideoURL.vue'
 import Introduction from '@/views/Introduction.vue'
-import Bookmarks from '@/views/Bookmarks.vue'
 import Preview from '@/views/Preview.vue'
+import Bookmarks from '@/views/Bookmarks.vue'
+import Subtitles from '@/views/Subtitles.vue'
 import Anchor from '@/views/Anchor.vue'
 import VideoStatisticsShow from '@/views/VideoStatisticsShow.vue'
 import { loadVideoInfo } from '@/common/varchiveVideo.js'
@@ -121,12 +89,10 @@ export default {
             isPlayPreview: false,
             isPlayBookmarks: false,
             isWebpsOnly: false,
-            isStopAutoScrollSub: false,
-            subPattern: "",
             bookmarkPattern: "",
             webSocket: {},
             isBeforeUnmount: false,
-            playerMessage: "playerInfo",
+            playerMessage: {},
             iinaCommand: "",
             hasNewIinaCommamd: false,
             subtitleInfoes: [],
@@ -135,7 +101,6 @@ export default {
             subtitlePlayingID: "",
             bookmarkPlayingID: "",
             subShowing: "",
-            isSubtitleMouseOver: false,
             isBookmarksMouseOver: false,
             bookmarkInfo: {},
             isHidePreview: false,
@@ -144,12 +109,18 @@ export default {
             isMouseoverBookmarks: false,
             isHideSubtitles: false,
             isMouseoverSubtitles: false,
+            subPageInfo: {
+                isSubtitleMouseOver: false,
+                isStopAutoScrollSub: false,
+                subPattern: "",
+            },
             isHideStatistics: false,
             isMouseoverStatistics: false,
             statistics: {},
         }
     },
-    components: { Anchor, Introduction, Preview, Bookmarks, Search, Refresh, CircleCheck, CircleCheckFilled, WarningFilled, Edit, Delete, RefreshLeft, Check, Close, View, Hide, VideoPlay, VideoPause, Film, Grid, List, WebpPreview, Bookmark, Subtitle, SubtitleSelector, VideoURL, VideoStatisticsShow },
+
+    components: { Anchor, Introduction, Preview, Bookmarks, Subtitles, Search, Refresh, CircleCheck, CircleCheckFilled, WarningFilled, Edit, Delete, RefreshLeft, Check, Close, View, Hide, VideoPlay, VideoPause, Film, Grid, List, WebpPreview, Bookmark, Subtitle, SubtitleSelector, VideoURL, VideoStatisticsShow },
 
     watch: {
         videoPos(newVideoPos, oldVideoPos) {
@@ -281,7 +252,7 @@ export default {
         },
 
         gotoSubPageByID(scrollContainerID, targetID) {
-            if (!this.isSubtitleMouseOver && !this.isStopAutoScrollSub && this.subPattern === "") {
+            if (!this.subPageInfo.isSubtitleMouseOver && !this.subPageInfo.isStopAutoScrollSub && this.subPageInfo.subPattern === "") {
                 this.gotoPageByID(scrollContainerID, targetID)
             }
             this.subtitlePlayingID = targetID

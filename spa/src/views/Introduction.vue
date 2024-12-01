@@ -56,7 +56,7 @@ export default {
     },
     props: {
         changeInfo: { type: Function, required: true },
-        renameOption: { type: Function, required: true },
+        renameOption: { type: Boolean, required: true },
         openInIINA: { type: Function, required: true },
         getRealImagSrc: { type: Function, required: true },
         setSeletedURL: { type: Function, required: true },
