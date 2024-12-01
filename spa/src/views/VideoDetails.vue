@@ -22,60 +22,10 @@
                 <Preview :webpPath="webpPath" :videoInfo="videoInfo" :getMessageToServer="getMessageToServer"
                     :sendMessage="sendMessage" :seekTo="seekTo" />
                 <br style="clear:both" />
-                <section id="bookmarks" class="bookmarks">
-                    <h2 @mouseover="isMouseoverBookmarks = true" @mouseout="isMouseoverBookmarks = false">Bookmarks
-                        <el-icon v-show="isMouseoverBookmarks && isHideBookmarks" class="icon" style="margin-left: 8px">
-                            <View @click="isHideBookmarks = false" />
-                        </el-icon>
-                        <el-icon v-show="isMouseoverBookmarks && !isHideBookmarks" class="icon"
-                            style="margin-left: 8px">
-                            <Hide @click="isHideBookmarks = true" />
-                        </el-icon>
-                    </h2>
-                    <div v-show="!isHideBookmarks">
-                        <div style="margin-bottom: 30px;">
-                            <el-input v-model="bookmarkPattern" clearable
-                                style="max-width: 600px;margin-bottom: 10px;float:right">
-                                <template #append>
-                                    <el-icon>
-                                        <Search />
-                                    </el-icon>
-                                </template>
-                            </el-input>
-                            <div style="margin-bottom: 15px;">
-                                <el-button-group class="ml-4">
-                                    <el-button v-show="!isPlayBookmarks" :icon="VideoPlayRaw"
-                                        @click="isPlayBookmarks = true">
-                                    </el-button>
-                                    <el-button v-show="isPlayBookmarks" :icon="VideoPauseRaw"
-                                        @click="isPlayBookmarks = false">
-                                    </el-button>
-                                    <el-button :icon="DeleteRaw" @click="clearBookmarks">
-                                    </el-button>
-                                    <el-button v-show="!isWebpsOnly" :icon="GridRaw" @click="isWebpsOnly = true">
-                                    </el-button>
-                                    <el-button v-show="isWebpsOnly" :icon="ListRaw" @click="isWebpsOnly = false">
-                                    </el-button>
-                                </el-button-group>
-                            </div>
-                        </div>
-                        <div v-show="isWebpsOnly">
-                            <WebpPreview v-for="bookmark in this.bookmarkInfo.bookmarks"
-                                @click="seekTo(bookmark.timestamp)" :key="bookmark.format" :webpPath="this.webpPath"
-                                :clip="bookmark.clip" :isPlay="isPlayBookmarks" />
-                        </div>
-                        <div v-show="!isWebpsOnly" class="scroll-container" id="bookmarks-scroll-container">
-                            <Bookmark v-for="(bookmark, index) in this.bookmarkInfo.bookmarks" :key="bookmark.format"
-                                @mouseover="this.isBookmarksMouseOver = true"
-                                @mouseout="this.isBookmarksMouseOver = false"
-                                :id="`bookmark-${bookmark.timestamp.toString()}`" :seekTo="seekTo"
-                                :webpPath="this.webpPath" :bookmark="bookmark" :index="index"
-                                :removeBookmark="removeBookmark" :bookmarkPattern="bookmarkPattern"
-                                :highlightTextWithMatch="highlightTextWithMatch" :editBookmark="editBookmark"
-                                :isPlayBookmarks="isPlayBookmarks" />
-                        </div>
-                    </div>
-                </section>
+                <Bookmarks :setIsBookmarksMouseOver="(val) => { isBookmarksMouseOver = val }" :clearBookmarks="clearBookmarks"
+                    :bookmarkInfo="bookmarkInfo" :seekTo="seekTo" :removeBookmark="removeBookmark"
+                    :highlightTextWithMatch="highlightTextWithMatch" :editBookmark="editBookmark"
+                    :webpPath="webpPath" />
                 <br style="clear:both" />
                 <section id="subtitles" class="subtitles">
                     <h2 @mouseover="isMouseoverSubtitles = true" @mouseout="isMouseoverSubtitles = false">Subtitle
@@ -133,6 +83,7 @@ import Subtitle from '@/components/Subtitle.vue'
 import SubtitleSelector from '@/components/SubtitleSelector.vue'
 import VideoURL from '@/components/VideoURL.vue'
 import Introduction from '@/views/Introduction.vue'
+import Bookmarks from '@/views/Bookmarks.vue'
 import Preview from '@/views/Preview.vue'
 import Anchor from '@/views/Anchor.vue'
 import VideoStatisticsShow from '@/views/VideoStatisticsShow.vue'
@@ -198,7 +149,7 @@ export default {
             statistics: {},
         }
     },
-    components: { Anchor, Introduction, Preview, Search, Refresh, CircleCheck, CircleCheckFilled, WarningFilled, Edit, Delete, RefreshLeft, Check, Close, View, Hide, VideoPlay, VideoPause, Film, Grid, List, WebpPreview, Bookmark, Subtitle, SubtitleSelector, VideoURL, VideoStatisticsShow },
+    components: { Anchor, Introduction, Preview, Bookmarks, Search, Refresh, CircleCheck, CircleCheckFilled, WarningFilled, Edit, Delete, RefreshLeft, Check, Close, View, Hide, VideoPlay, VideoPause, Film, Grid, List, WebpPreview, Bookmark, Subtitle, SubtitleSelector, VideoURL, VideoStatisticsShow },
 
     watch: {
         videoPos(newVideoPos, oldVideoPos) {
