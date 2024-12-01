@@ -450,6 +450,7 @@ class WebSocketManager:
                 currentURL = json.loads(messageJson["message"])["currentURL"]
                 self.iinaVIconnectInfo[ID] = currentURL
                 self.ResourceMap.pushRecentByURL(currentURL)
+                self.ResourceMap.addVideoPathIfAvailableFromIina(currentURL)
             else:
                 message = json.loads(messageJson["message"])
                 currentURL = message["currentURL"]

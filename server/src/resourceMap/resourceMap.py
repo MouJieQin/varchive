@@ -305,6 +305,14 @@ class ResourceMapManager:
             return ""
         return linkDir[0 : -len(self.postfixOfLink)]
 
+    def addVideoPathIfAvailableFromIina(self, url: str):
+        if not url.startswith(self.localFileHeader):
+            return
+        else:
+            videoPath = url[len(self.localFileHeader) :]
+            linkDir = self.getLinkDirByLocalPath(videoPath)
+            self.addVideoPathIfAvailable(linkDir)
+
     def addVideoPathIfAvailable(self, path: str):
         localVideoPath = self.getLocalVideoPathByLinkDir(path)
         if not os.path.exists(localVideoPath):
