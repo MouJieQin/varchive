@@ -15,43 +15,10 @@
                 </el-button-group>
             </div>
             <section class="container">
-                <section id="introduction" class="introduction">
-                    <div style="display: flex; align-items: center; margin-bottom:10px">
-                        <el-button-group class="ml-4">
-                            <el-button v-if="!isInfoEditing" :icon="EditRaw" style="" @click="isInfoEditing = true">
-                            </el-button>
-                            <el-button v-if="isInfoEditing" :icon="CloseRaw" @click="isInfoEditing = false">
-                            </el-button>
-                            <el-button v-if="isInfoEditing" :icon="CheckRaw" @click="changeInfo(infoEditing)">
-                            </el-button>
-                        </el-button-group>
-                    </div>
-                    <div class="title">
-                        <h1 v-if="!isInfoEditing" style="text-align: center;">{{ this.videoInfo.title }}
-                            <el-icon v-if="renameOption" class="icon" style="margin-left: 8px">
-                                <Refresh @click="renameVarchiveLinkDir" />
-                            </el-icon>
-                        </h1>
-                        <el-input v-if="isInfoEditing" v-model="this.infoEditing.title" clearable
-                            style="margin-bottom: 10px;max-width: 40%">
-                            <template #prepend>Title</template>
-                        </el-input>
-                    </div>
-                    <div class="header">
-                        <img class="cover" @click="openInIINA(urlSelected)" @mouseover="this.isCoverMouseOver = true"
-                            @mouseout="this.isCoverMouseOver = false" :src="coverSrc" alt="cover">
-                        <p class="editing" v-if="!isInfoEditing" v-html="this.videoInfo.description"></p>
-                        <el-input v-else v-model="this.infoEditing.description" autosize type="textarea"
-                            placeholder="Please input description" />
-                    </div>
-
-                    <VideoURL :paths="videoInfo.path" :openInIINA="openInIINA"
-                        :setSeletedURL="(url) => { this.urlSelected = url }" :updateURL="updateURL" />
-
-                    <p class="editing" v-if="!isInfoEditing" v-html="this.videoInfo.info"></p>
-                    <el-input v-else v-model="this.infoEditing.info" autosize type="textarea"
-                        style="margin-bottom: 10px;" placeholder="Please input more information" />
-                </section>
+                <Introduction :changeInfo="changeInfo" :renameOption="renameOption" :openInIINA="openInIINA"
+                    :getRealImagSrc="getRealImagSrc" :setSeletedURL="(url) => { urlSelected = url }"
+                    :updateURL="updateURL" :renameVarchiveLinkDir="renameVarchiveLinkDir" :infoEditing="infoEditing"
+                    :videoInfo="videoInfo" :urlSelected="urlSelected" />
                 <Preview :webpPath="webpPath" :videoInfo="videoInfo" :getMessageToServer="getMessageToServer"
                     :sendMessage="sendMessage" :seekTo="seekTo" />
                 <br style="clear:both" />
@@ -165,6 +132,7 @@ import Bookmark from '@/components/Bookmark.vue'
 import Subtitle from '@/components/Subtitle.vue'
 import SubtitleSelector from '@/components/SubtitleSelector.vue'
 import VideoURL from '@/components/VideoURL.vue'
+import Introduction from '@/views/Introduction.vue'
 import Preview from '@/views/Preview.vue'
 import Anchor from '@/views/Anchor.vue'
 import VideoStatisticsShow from '@/views/VideoStatisticsShow.vue'
@@ -230,7 +198,7 @@ export default {
             statistics: {},
         }
     },
-    components: { Anchor, Preview, Search, Refresh, CircleCheck, CircleCheckFilled, WarningFilled, Edit, Delete, RefreshLeft, Check, Close, View, Hide, VideoPlay, VideoPause, Film, Grid, List, WebpPreview, Bookmark, Subtitle, SubtitleSelector, VideoURL, VideoStatisticsShow },
+    components: { Anchor, Introduction, Preview, Search, Refresh, CircleCheck, CircleCheckFilled, WarningFilled, Edit, Delete, RefreshLeft, Check, Close, View, Hide, VideoPlay, VideoPause, Film, Grid, List, WebpPreview, Bookmark, Subtitle, SubtitleSelector, VideoURL, VideoStatisticsShow },
 
     watch: {
         videoPos(newVideoPos, oldVideoPos) {
