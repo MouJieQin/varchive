@@ -1,15 +1,19 @@
 <template>
-    <el-button v-if="!isSort" :icon="SortDownRaw"
-        @click="async () => { this.isSort = true; await this.pageUpdateForBarChart(true) }">
-    </el-button>
-    <el-button v-if="isSort" :icon="RefreshLeftRaw"
-        @click="async () => { this.isSort = false; await this.pageUpdateForBarChart(true) }">
-    </el-button>
-    <div class="scroll-container" id="statistics-scroll-container" style="margin-top:15px;">
-        <div>
-            <div id="bar-chart" style="float: left; width: 100%; height: 500px;"></div>
+    <section id="statistics" class="statistics">
+        <h2 @mouseover="isMouseoverStatistics = true" @mouseout="isMouseoverStatistics = false">Statistics
+        </h2>
+        <el-button v-if="!isSort" :icon="SortDownRaw"
+            @click="async () => { isSort = true; await pageUpdateForBarChart(true) }">
+        </el-button>
+        <el-button v-if="isSort" :icon="RefreshLeftRaw"
+            @click="async () => { isSort = false; await pageUpdateForBarChart(true) }">
+        </el-button>
+        <div class="scroll-container" id="statistics-scroll-container" style="margin-top:15px;">
+            <div>
+                <div id="bar-chart" style="float: left; width: 100%; height: 500px;"></div>
+            </div>
         </div>
-    </div>
+    </section>
 </template>
 
 <script>
@@ -28,6 +32,7 @@ export default {
             barChart: null,
             isBarClickAdded: false,
             isSortedBarClickAdded: false,
+            isMouseoverStatistics: false,
             barChartDynamicSortZZTOption: {
                 title: {
                     left: '3%',

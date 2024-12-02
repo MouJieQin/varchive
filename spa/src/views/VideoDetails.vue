@@ -30,11 +30,8 @@
                 <Subtitles :subPageInfo="subPageInfo" :playerMessage="playerMessage" :subtitleInfoes="subtitleInfoes"
                     :subShowing="subShowing" :setSubtitleInfoes="setSubtitleInfoes" :setSubShowing="setSubShowing"
                     :highlightTextWithMatch="highlightTextWithMatch" :seekTo="seekTo" />
-                <section id="statistics" class="statistics">
-                    <h2 @mouseover="isMouseoverStatistics = true" @mouseout="isMouseoverStatistics = false">Statistics
-                    </h2>
-                    <VideoStatisticsShow :statistics="statistics" :seekTo="seekTo" />
-                </section>
+                <br style="clear:both" />
+                <Statistics :statistics="statistics" :seekTo="seekTo" />
             </section>
         </div>
         <el-backtop :bottom="20" />
@@ -54,7 +51,7 @@ import Preview from '@/views/Preview.vue'
 import Bookmarks from '@/views/Bookmarks.vue'
 import Subtitles from '@/views/Subtitles.vue'
 import Anchor from '@/views/Anchor.vue'
-import VideoStatisticsShow from '@/views/VideoStatisticsShow.vue'
+import Statistics from '@/views/Statistics.vue'
 import { loadVideoInfo } from '@/common/varchiveVideo.js'
 import { ElMessage, ElNotification, ElMessageBox } from 'element-plus';
 import { markRaw } from 'vue'
@@ -120,7 +117,7 @@ export default {
         }
     },
 
-    components: { Anchor, Introduction, Preview, Bookmarks, Subtitles, Search, Refresh, CircleCheck, CircleCheckFilled, WarningFilled, Edit, Delete, RefreshLeft, Check, Close, View, Hide, VideoPlay, VideoPause, Film, Grid, List, WebpPreview, Bookmark, Subtitle, SubtitleSelector, VideoURL, VideoStatisticsShow },
+    components: { Anchor, Introduction, Preview, Bookmarks, Subtitles, Statistics, Search, Refresh, CircleCheck, CircleCheckFilled, WarningFilled, Edit, Delete, RefreshLeft, Check, Close, View, Hide, VideoPlay, VideoPause, Film, Grid, List, WebpPreview, Bookmark, Subtitle, SubtitleSelector, VideoURL },
 
     watch: {
         videoPos(newVideoPos, oldVideoPos) {
