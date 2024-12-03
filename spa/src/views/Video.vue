@@ -1,12 +1,12 @@
 <template>
-    <!-- <div class="dir-nav" tabindex="-1" @keydown="checkKeyDown" @keyup="checkKeyUp">
+    <div v-if="!isPluginEnvironment" class="dir-nav" tabindex="-1" @keydown="checkKeyDown" @keyup="checkKeyUp">
         <router-link @click="dirUpdate" v-for="folder in this.lastFolders" :id="this.dirs[folder.filename]"
             :class="folder.type" :key="this.dirs[folder.filename]" @keydown="checkKeyDown" @keyup="checkKeyUp"
             @mouseover="mouseOverRouterLink = this.dirs[folder.filename]" @mouseout="mouseOverRouterLink = ''"
             :to="{ name: this.dirs[folder.filename] }">
             {{ folder.filename }}
         </router-link>
-    </div> -->
+    </div>
     <router-view></router-view>
 </template>
 
@@ -27,6 +27,7 @@ export default {
             currFolder: null,
             mouseOverRouterLink: "",
             isMetaKeyDown: false,
+            isPluginEnvironment: false,
         }
     },
     props: {
@@ -75,7 +76,7 @@ export default {
                 return
             }
             await this.$router.replace({ name: parent })
-            await this.$router.push({ name: targetFolder, query: { isPluginEnvironment: this.$route.query.isPluginEnvironment } })
+            await this.$router.push({ name: targetFolder, query: { isPluginEnvironment: this.isPluginEnvironment } })
         },
         async initData(currRouterName) {
             const url = config.server.concat(config.get.filemanager, "?path=", currRouterName)
@@ -125,6 +126,7 @@ export default {
         },
     },
     async created() {
+        this.isPluginEnvironment = this.$route.query.isPluginEnvironment === 'true'
         this.currFolder = "video"
         const res = await this.initData(this.currFolder)
         if (res != 0) {
@@ -138,7 +140,7 @@ export default {
                     await new Promise((resolve) => {
                         let timer = setInterval(() => {
                             if (this.$router.hasRoute(this.currFolder)) {
-                                this.$router.push({ name: this.currFolder, query: { isPluginEnvironment: this.$route.query.isPluginEnvironment } })
+                                this.$router.push({ name: this.currFolder, query: { isPluginEnvironment: this.isPluginEnvironment } })
                                 resolve(true)
                                 clearInterval(timer)
                             }

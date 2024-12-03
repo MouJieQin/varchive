@@ -1,9 +1,9 @@
 <template>
     <div v-show="isMatch" class="bookmark" @mouseover="isMouseOver = true" @mouseout="isMouseOver = false">
-        <div class="timestamp">{{ bookmark.format }}</div>
+        <!-- <div class="timestamp">{{ bookmark.format }}</div> -->
         <div>
             <WebpPreview @click="seekTo(bookmark.timestamp)" :webpPath="webpPath" :clip="bookmark.clip"
-                :isPlay="isPlayBookmarks" />
+                :isPlay="isPlayBookmarks" style="margin-right: 30px;"/>
         </div>
         <div>
             <div v-show="isMouseOver" style="margin-bottom: 20px;">

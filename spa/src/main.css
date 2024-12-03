@@ -113,25 +113,32 @@ body {
     white-space: pre-wrap;
 }
 
-/* Button */
-.btn {
-    margin-bottom: 5px;
-    background-color: rgba(32, 35, 41, 1);
-    color: #cccccc;
-    padding: 10px 20px;
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.image-timestamp {
+    position: absolute;
+    bottom: 18px;
+    right: 18px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 1px;
+    font-size: 12px;
     border-radius: 5px;
-    cursor: pointer;
-    transition: transform 0.2s;
+    opacity: 0.7; 
 }
 
-.btn:hover {
-    transform: scale(1.05);
-    background-color: #121921;
-}
-
-.btn:active {
-    transform: scale(0.95);
-}
+.image-icon {
+    position: absolute;
+    max-width: 20px;
+    top: 8px;
+    right: 8px;
+    font-size: 18px;
+    color: white;
+    opacity: 0.7;
+} 
 
 /* el-icon */
 .icon {
@@ -259,9 +266,21 @@ body {
     margin-top: 30px;
 }
 
-.image-container {
+/* .image-container {
     position: relative;
     display: inline-block;
+}
+
+.image-timestamp {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    /* top: 8px;
+    right: 80px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
 }
 
 .image-icon {
@@ -272,7 +291,7 @@ body {
     font-size: 18px;
     color: white;
     opacity: 0.7;
-}
+} */
 
 .gallery .gallery-cover img {
     width: 320px;
@@ -280,7 +299,7 @@ body {
     object-fit: contain;
     display: block;
     border-radius: 10px;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 10px 0 rgba(7, 6, 6, 0.2);
     cursor: pointer;
     transition: transform 0.2s;
 }
@@ -339,9 +358,8 @@ body {
     width: 320px;
     height: auto;
     margin-top: 10px;
-    border-radius: 4px;
-    border: 3px solid white;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    box-shadow: 0 0 10px 0 rgba(7, 6, 6, 0.2);
     cursor: pointer;
 }
 
@@ -367,9 +385,8 @@ body {
     margin: 10px;
     object-fit: contain;
     display: block;
-    border-radius: 4px;
-    border: 3px solid white;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    box-shadow: 0 0 10px 0 rgba(7, 6, 6, 0.2);
     cursor: pointer;
     transition: transform 0.2s;
 }
@@ -396,9 +413,8 @@ body {
     margin: 10px;
     object-fit: contain;
     display: block;
-    border-radius: 4px;
-    border: 3px solid white;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    box-shadow: 0 0 10px 0 rgba(7, 6, 6, 0.2);
     cursor: pointer;
     transition: transform 0.2s;
 }
@@ -416,12 +432,11 @@ body {
     /* height: 131px; */
     float: left;
     margin-left: 10px;
-    margin-right: 30px;
+    /* margin-right: 30px; */
     object-fit: contain;
     display: block;
-    border-radius: 4px;
-    border: 3px solid white;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    box-shadow: 0 0 10px 0 rgba(7, 6, 6, 0.2);
     cursor: pointer;
     transition: transform 0.2s;
 }
