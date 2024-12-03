@@ -1,12 +1,12 @@
 <template>
-    <div class="dir-nav" tabindex="-1" @keydown="checkKeyDown" @keyup="checkKeyUp">
+    <!-- <div class="dir-nav" tabindex="-1" @keydown="checkKeyDown" @keyup="checkKeyUp">
         <router-link @click="dirUpdate" v-for="folder in this.lastFolders" :id="this.dirs[folder.filename]"
             :class="folder.type" :key="this.dirs[folder.filename]" @keydown="checkKeyDown" @keyup="checkKeyUp"
             @mouseover="mouseOverRouterLink = this.dirs[folder.filename]" @mouseout="mouseOverRouterLink = ''"
             :to="{ name: this.dirs[folder.filename] }">
             {{ folder.filename }}
         </router-link>
-    </div>
+    </div> -->
     <router-view></router-view>
 </template>
 
@@ -75,16 +75,8 @@ export default {
                 return
             }
             await this.$router.replace({ name: parent })
-            await this.$router.push({ name: targetFolder })
+            await this.$router.push({ name: targetFolder, query: { isPluginEnvironment: this.$route.query.isPluginEnvironment } })
         },
-        async checkSignal() {
-            if (this.$router.hasRoute(this.currFolder)) {
-                await this.$router.push({ name: this.currFolder })
-                return;
-            }
-            requestAnimationFrame(this.checkSignal);
-        },
-
         async initData(currRouterName) {
             const url = config.server.concat(config.get.filemanager, "?path=", currRouterName)
             try {
@@ -146,7 +138,7 @@ export default {
                     await new Promise((resolve) => {
                         let timer = setInterval(() => {
                             if (this.$router.hasRoute(this.currFolder)) {
-                                this.$router.push({ name: this.currFolder })
+                                this.$router.push({ name: this.currFolder, query: { isPluginEnvironment: this.$route.query.isPluginEnvironment } })
                                 resolve(true)
                                 clearInterval(timer)
                             }

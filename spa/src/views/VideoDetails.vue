@@ -1,20 +1,62 @@
 <template>
-    <div>
-        <Anchor class="sticky" />
-        <div id="video-details">
+    <div v-if="isPluginEnvironment">
+        <el-tabs v-model="tabLabelShowing" type="border-card">
             <div style="float: right; text-align: right;">
                 <el-button-group class="ml-4">
-                    <el-button v-if="connection === 'serverConnected'" :icon="CheckRaw" type="primary" plain circle>
+                    <el-button v-if="connection === 'serverConnected'" :icon="ConnectionRaw" type="primary" plain
+                        circle>
                     </el-button>
-                    <el-button v-else-if="connection === 'iinaConnected'" :icon="CheckRaw" type="success" circle>
+                    <el-button v-else-if="connection === 'iinaConnected'" :icon="ConnectionRaw" type="success" circle>
                     </el-button>
-                    <el-button v-else :icon="WarningRaw" type="warning" circle>
+                    <el-button v-else :icon="ConnectionRaw" type="warning" circle>
                     </el-button>
                     <el-button :icon="DeleteRaw" type="danger" plain circle style="float:right" @click="deleteVarchive">
                     </el-button>
                 </el-button-group>
             </div>
-            <section class="container">
+            <el-tab-pane label="Introduction" name="Introduction">
+                <Introduction :changeInfo="changeInfo" :renameOption="renameOption" :openInIINA="openInIINA"
+                    :getRealImagSrc="getRealImagSrc" :setSeletedURL="(url) => { urlSelected = url }"
+                    :updateURL="updateURL" :renameVarchiveLinkDir="renameVarchiveLinkDir" :infoEditing="infoEditing"
+                    :videoInfo="videoInfo" :urlSelected="urlSelected" />
+            </el-tab-pane>
+            <el-tab-pane label="Preview" name="Preview">
+                <Preview :webpPath="webpPath" :videoInfo="videoInfo" :getMessageToServer="getMessageToServer"
+                    :sendMessage="sendMessage" :seekTo="seekTo" />
+            </el-tab-pane>
+            <el-tab-pane label="Bookmark" name="Bookmark">
+                <Bookmarks :setIsBookmarksMouseOver="(val) => { isBookmarksMouseOver = val }"
+                    :clearBookmarks="clearBookmarks" :bookmarkInfo="bookmarkInfo" :seekTo="seekTo"
+                    :removeBookmark="removeBookmark" :highlightTextWithMatch="highlightTextWithMatch"
+                    :editBookmark="editBookmark" :webpPath="webpPath" />
+            </el-tab-pane>
+            <el-tab-pane label="Subtitle" name="Subtitle">
+                <Subtitles :subPageInfo="subPageInfo" :playerMessage="playerMessage" :subtitleInfoes="subtitleInfoes"
+                    :subShowing="subShowing" :setSubtitleInfoes="setSubtitleInfoes" :setSubShowing="setSubShowing"
+                    :highlightTextWithMatch="highlightTextWithMatch" :seekTo="seekTo" />
+            </el-tab-pane>
+            <el-tab-pane label="Statistics" name="Statistics">
+                <Statistics :statistics="statistics" :seekTo="seekTo" />
+            </el-tab-pane>
+        </el-tabs>
+    </div>
+    <div v-else>
+        <Anchor class="sticky" />
+        <div id="video-details">
+            <div style="float: right; text-align: right;">
+                <el-button-group class="ml-4">
+                    <el-button v-if="connection === 'serverConnected'" :icon="ConnectionRaw" type="primary" plain
+                        circle>
+                    </el-button>
+                    <el-button v-else-if="connection === 'iinaConnected'" :icon="ConnectionRaw" type="success" circle>
+                    </el-button>
+                    <el-button v-else :icon="ConnectionRaw" type="warning" circle>
+                    </el-button>
+                    <el-button :icon="DeleteRaw" type="danger" plain circle style="float:right" @click="deleteVarchive">
+                    </el-button>
+                </el-button-group>
+            </div>
+            <div class="container">
                 <Introduction :changeInfo="changeInfo" :renameOption="renameOption" :openInIINA="openInIINA"
                     :getRealImagSrc="getRealImagSrc" :setSeletedURL="(url) => { urlSelected = url }"
                     :updateURL="updateURL" :renameVarchiveLinkDir="renameVarchiveLinkDir" :infoEditing="infoEditing"
@@ -32,7 +74,7 @@
                     :highlightTextWithMatch="highlightTextWithMatch" :seekTo="seekTo" />
                 <br style="clear:both" />
                 <Statistics :statistics="statistics" :seekTo="seekTo" />
-            </section>
+            </div>
         </div>
         <el-backtop :bottom="20" />
     </div>
@@ -40,7 +82,7 @@
 
 <script>
 import config from '@/config.json'
-import { Search, View, Hide, CircleCheck, CircleCheckFilled, Warning, WarningFilled, Check, Close, Edit, Refresh, Delete, VideoPlay, VideoPause, Film, RefreshLeft, Grid, List } from '@element-plus/icons-vue'
+import { Connection, Search, View, Hide, CircleCheck, CircleCheckFilled, Warning, WarningFilled, Check, Close, Edit, Refresh, Delete, VideoPlay, VideoPause, Film, RefreshLeft, Grid, List } from '@element-plus/icons-vue'
 import WebpPreview from '@/components/WebpPreview.vue'
 import Bookmark from '@/components/Bookmark.vue'
 import Subtitle from '@/components/Subtitle.vue'
@@ -68,12 +110,15 @@ export default {
             EditRaw: markRaw(Edit),
             CloseRaw: markRaw(Close),
             CheckRaw: markRaw(Check),
+            ConnectionRaw: markRaw(Connection),
             VideoPlayRaw: markRaw(VideoPlay),
             VideoPauseRaw: markRaw(VideoPause),
             FilmRaw: markRaw(Film),
             GridRaw: markRaw(Grid),
             ListRaw: markRaw(List),
             RefreshLeftRaw: markRaw(RefreshLeft),
+            tabLabelShowing: "Bookmark",
+            isPluginEnvironment: false,
             currentPath: "",
             connection: "closed",
             isInfoEditing: false,
@@ -640,15 +685,20 @@ export default {
         },
         goToIntroduce() {
             document.getElementById("introduction").scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' })
+        },
+        handlePlugin() {
+            this.isPluginEnvironment = this.$route.query.isPluginEnvironment === "true"
         }
     },
     async created() {
+        this.handlePlugin()
         await this.webSocketManager()
         await this.loadInfo()
-        // await this.loadJson()
         await this.loadElements()
         document.title = this.videoInfo.title
-        this.goToIntroduce()
+        if (!this.isPluginEnvironment) {
+            this.goToIntroduce()
+        }
     },
     async beforeUnmount() {
         this.isBeforeUnmount = true

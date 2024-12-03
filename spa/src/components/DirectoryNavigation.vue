@@ -78,7 +78,7 @@ export default {
                 return
             }
             await this.$router.replace({ name: parent })
-            await this.$router.push({ name: targetFolder })
+            await this.$router.push({ name: targetFolder, query: { isPluginEnvironment: this.$route.query.isPluginEnvironment } })
         },
         async initData(currRouterName) {
             const url = config.server.concat(config.get.filemanager, "?path=", currRouterName)
@@ -99,7 +99,7 @@ export default {
                                 props: route => ({ ...route.params })
                             }
                         )
-                        await this.$router.push({ name: currRouterName.concat("/details") })
+                        await this.$router.push({ name: currRouterName.concat("/details"), query: { isPluginEnvironment: this.$route.query.isPluginEnvironment } })
                         return
                     case 1:
                         throw new Error(currRouterName + " is a file!");

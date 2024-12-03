@@ -50,8 +50,8 @@ export default {
             CloseRaw: markRaw(Close),
             CheckRaw: markRaw(Check),
             isEditing: false,
-            urls: JSON.parse(JSON.stringify(this.paths)),
-            // urls: typeof this.paths !== 'undefined' ? JSON.parse(JSON.stringify(this.paths)) : {},
+            // urls: {},
+            urls: this.paths? JSON.parse(JSON.stringify(this.paths)) : {},
             selectedURL: "",
         }
     },
@@ -112,9 +112,6 @@ export default {
             }
             this.selectedURL = this.paths.lenght !== 0 ? this.paths[0].url : ""
         }
-    },
-    async mounted() {
-        this.initUrlSelected()
     }
 }
 </script>
