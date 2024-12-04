@@ -27,7 +27,7 @@
                 @mouseover="subPageInfo.isStopAutoScrollSub = true; subPageInfo.isSubtitleMouseOver = true"
                 @mouseout="subPageInfo.isSubtitleMouseOver = false">
                 <Subtitle v-for="subtitleInfo in subtitleInfoes" :key="subtitleInfo"
-                    :id="`${subShowing}-${subtitleInfo.startTimeFormat}`" :subtitleInfo="subtitleInfo"
+                    :id="`${subShowing}-${subtitleInfo.startTimeFormat}`" :isPluginEnvironment="isPluginEnvironment" :subtitleInfo="subtitleInfo"
                     :subPattern="subPageInfo.subPattern" :highlightTextWithMatch="highlightTextWithMatch"
                     :seekTo="seekTo" />
             </div>
@@ -47,15 +47,13 @@ export default {
             RefreshLeftRaw: markRaw(RefreshLeft),
             isMouseoverSubtitles: false,
             isHideSubtitles: false,
-            // isStopAutoScrollSub: false,
-            // isSubtitleMouseOver: false,
-            // subPattern: "",
         }
     },
     watch: {
 
     },
     props: {
+        isPluginEnvironment: { type: Boolean, required: true },
         subPageInfo: { type: Object, required: true },
         playerMessage: { type: Object, required: true },
         subtitleInfoes: { type: Object, required: true },

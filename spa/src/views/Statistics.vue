@@ -8,7 +8,12 @@
         <el-button v-if="isSort" :icon="RefreshLeftRaw"
             @click="async () => { isSort = false; await pageUpdateForBarChart(true) }">
         </el-button>
-        <div class="scroll-container" id="statistics-scroll-container" style="margin-top:15px;">
+        <div v-if="isPluginEnvironment" style="margin-top:15px;">
+            <div>
+                <div id="bar-chart" style="width: 100%"></div>
+            </div>
+        </div>
+        <div v-else class="scroll-container" id="statistics-scroll-container" style="margin-top:15px;">
             <div>
                 <div id="bar-chart" style="float: left; width: 100%; height: 500px;"></div>
             </div>
@@ -116,6 +121,7 @@ export default {
         }
     },
     props: {
+        isPluginEnvironment: { type: Boolean, required: true },
         statistics: { type: Object, required: true },
         seekTo: { type: Function, required: true },
     },

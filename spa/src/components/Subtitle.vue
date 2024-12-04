@@ -1,18 +1,13 @@
 <template>
     <div v-show="isMatch" class="subtitle" @mouseover="isMouseover = true" @mouseout="isMouseover = false">
-        <div class="timestamp">{{ subtitleInfo.startTimeFormat }}
-            <el-icon v-show="isMouseover" class="icon" style="margin-left: 15px">
-                <Back @click="seekTo(subtitleInfo.startTime)" />
-            </el-icon>
+        <div class="timestamp" @click=seekTo(subtitleInfo.startTime)>{{ subtitleInfo.startTimeFormat }}
         </div>
-        <div v-html="highlightedText"></div>
+        <div v-if="isPluginEnvironment" v-html="highlightedText" style="font-size: 12px;"></div>
+        <div v-else v-html="highlightedText"></div>
     </div>
 </template>
 
 <script>
-
-import WebpPreview from '@/components/WebpPreview.vue'
-import { Back } from '@element-plus/icons-vue'
 
 export default {
     data() {
@@ -23,6 +18,7 @@ export default {
         }
     },
     props: {
+        isPluginEnvironment: { type: Boolean, required: true },
         subtitleInfo: { type: Object, required: true },
         subPattern: { type: String, required: true },
         highlightTextWithMatch: { type: Function, required: true },
@@ -35,6 +31,6 @@ export default {
             this.highlightedText = result.highlightedText
         },
     },
-    components: { Back },
+    components: {},
 }
 </script>

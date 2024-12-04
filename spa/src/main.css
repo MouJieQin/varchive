@@ -470,11 +470,6 @@ body {
     background-color: rgb(35, 48, 82);
 }
 
-.bookmarks .bookmark .timestamp {
-    display: flex;
-    margin-right: 20px;
-}
-
 /* subtitle */
 .subtitles {
     clear: both;
@@ -509,7 +504,13 @@ body {
     display: flex;
     text-align: center;
     justify-content: center;
-    margin-right: 50px;
+    /* margin-right: 50px; */
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 5px;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 /* statistic */

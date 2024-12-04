@@ -32,12 +32,12 @@
                     :webpPath="webpPath" />
             </el-tab-pane>
             <el-tab-pane label="Subtitle" name="Subtitle">
-                <Subtitles :subPageInfo="subPageInfo" :playerMessage="playerMessage" :subtitleInfoes="subtitleInfoes"
+                <Subtitles :isPluginEnvironment="isPluginEnvironment" :subPageInfo="subPageInfo" :playerMessage="playerMessage" :subtitleInfoes="subtitleInfoes"
                     :subShowing="subShowing" :setSubtitleInfoes="setSubtitleInfoes" :setSubShowing="setSubShowing"
                     :highlightTextWithMatch="highlightTextWithMatch" :seekTo="seekTo" />
             </el-tab-pane>
             <el-tab-pane label="Statistics" name="Statistics">
-                <Statistics :statistics="statistics" :seekTo="seekTo" />
+                <Statistics  :isPluginEnvironment="isPluginEnvironment" :statistics="statistics" :seekTo="seekTo" />
             </el-tab-pane>
         </el-tabs>
     </div>
