@@ -1,6 +1,8 @@
 <template>
     <div class="image-container">
-        <img class="cover" @mouseover="isMouseOver = true" @mouseout="isMouseOver = false" :src="clipImgSrc()"
+        <img v-if="imgWidth" class="cover" @mouseover="isMouseOver = true" @mouseout="isMouseOver = false"
+            :src="clipImgSrc()" :alt="clip.cover" :style="{ width: imgWidth + 'px' }">
+        <img v-else class="cover" @mouseover="isMouseOver = true" @mouseout="isMouseOver = false" :src="clipImgSrc()"
             :alt="clip.cover">
         <div v-show="!isMouseOver" class="image-timestamp">{{ formatTime(clip.startTime) }}</div>
     </div>
@@ -15,6 +17,7 @@ export default {
     },
 
     props: {
+        imgWidth: { type: Number, required: false },
         webpPath: { type: String, required: true },
         clip: { type: Object, required: true },
         isPlay: { type: Boolean, required: true },

@@ -51,7 +51,7 @@ export default {
             CheckRaw: markRaw(Check),
             isEditing: false,
             // urls: {},
-            urls: this.paths? JSON.parse(JSON.stringify(this.paths)) : {},
+            urls: this.paths ? JSON.parse(JSON.stringify(this.paths)) : {},
             selectedURL: "",
         }
     },
@@ -104,6 +104,7 @@ export default {
             //     this.selectedURL = ""
             //     return
             // }
+            this.urls = this.paths ? JSON.parse(JSON.stringify(this.paths)) : {}
             for (var i = 0, len = this.paths.length; i < len; ++i) {
                 if (this.paths[i].isSelected) {
                     this.selectedURL = this.paths[i].url

@@ -15,7 +15,7 @@
                 </el-button-group>
             </div>
             <el-tab-pane label="Introduction" name="Introduction">
-                <Introduction :changeInfo="changeInfo" :renameOption="renameOption" :openInIINA="openInIINA"
+                <Introduction :isPluginEnvironment="isPluginEnvironment" :changeInfo="changeInfo" :renameOption="renameOption" :openInIINA="openInIINA"
                     :getRealImagSrc="getRealImagSrc" :setSeletedURL="(url) => { urlSelected = url }"
                     :updateURL="updateURL" :renameVarchiveLinkDir="renameVarchiveLinkDir" :infoEditing="infoEditing"
                     :videoInfo="videoInfo" :urlSelected="urlSelected" />
@@ -26,9 +26,10 @@
             </el-tab-pane>
             <el-tab-pane label="Bookmark" name="Bookmark">
                 <Bookmarks :setIsBookmarksMouseOver="(val) => { isBookmarksMouseOver = val }"
-                    :clearBookmarks="clearBookmarks" :bookmarkInfo="bookmarkInfo" :seekTo="seekTo"
-                    :removeBookmark="removeBookmark" :highlightTextWithMatch="highlightTextWithMatch"
-                    :editBookmark="editBookmark" :webpPath="webpPath" />
+                    :isPluginEnvironment="isPluginEnvironment" :clearBookmarks="clearBookmarks"
+                    :bookmarkInfo="bookmarkInfo" :seekTo="seekTo" :removeBookmark="removeBookmark"
+                    :highlightTextWithMatch="highlightTextWithMatch" :editBookmark="editBookmark"
+                    :webpPath="webpPath" />
             </el-tab-pane>
             <el-tab-pane label="Subtitle" name="Subtitle">
                 <Subtitles :subPageInfo="subPageInfo" :playerMessage="playerMessage" :subtitleInfoes="subtitleInfoes"

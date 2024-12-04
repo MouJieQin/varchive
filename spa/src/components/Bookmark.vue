@@ -2,34 +2,38 @@
     <div v-show="isMatch" class="bookmark" @mouseover="isMouseOver = true" @mouseout="isMouseOver = false">
         <!-- <div class="timestamp">{{ bookmark.format }}</div> -->
         <div>
-            <WebpPreview @click="seekTo(bookmark.timestamp)" :webpPath="webpPath" :clip="bookmark.clip"
-                :isPlay="isPlayBookmarks" style="margin-right: 30px;"/>
+            <WebpPreview v-if="!isPluginEnvironment" @click="seekTo(bookmark.timestamp)" :webpPath="webpPath"
+                :clip="bookmark.clip" :isPlay="isPlayBookmarks" style="margin-right: 30px;" />
+            <WebpPreview v-else @click="seekTo(bookmark.timestamp)" :imgWidth="150" :webpPath="webpPath"
+                :clip="bookmark.clip" :isPlay="isPlayBookmarks" style="margin-right: 30px;" />
         </div>
         <div>
-            <div v-show="isMouseOver" style="margin-bottom: 20px;">
-                <el-popconfirm confirm-button-text="Delete" cancel-button-text="No" icon-color="#E6A23C"
-                    title="Delete this bookmark?" @confirm="removeBookmark(index, bookmark.timestamp)" @cancel="">
-                    <template #reference>
-                        <el-icon class="icon" style="margin-left: 15px">
-                            <Delete />
-                        </el-icon>
-                    </template>
-                </el-popconfirm>
-
-                <el-icon v-show="!isEditingBookmark" class="icon" style="margin-left: 15px; float:left">
-                    <Edit @click="isEditingBookmark = true" />
-                </el-icon>
-                <el-icon v-show="!isEditingBookmark" class="icon" style="margin-left: 15px; float:left">
-                    <CopyDocument @click="copyBookmark" />
-                </el-icon>
-                <el-icon v-show="isEditingBookmark" class="icon" style="margin-left: 15px; float:left">
-                    <Close @click="isEditingBookmark = false" />
-                </el-icon>
-                <el-icon v-show="isEditingBookmark" class="icon" style="margin-left: 15px; float:left">
-                    <Check @click="handleEditBookmark(index, bookmarkForEditing)" />
-                </el-icon>
+            <!-- <div v-show="isMouseOver" :style="{ display: showElement ? 'block' : 'none' }" style="margin-bottom: 20px;"> -->
+            <div :style="{ visibility: isMouseOver ? 'visible' : 'hidden' }">
+                <div style="margin-bottom: 20px;">
+                    <el-popconfirm confirm-button-text="Delete" cancel-button-text="No" icon-color="#E6A23C"
+                        title="Delete this bookmark?" @confirm="removeBookmark(index, bookmark.timestamp)" @cancel="">
+                        <template #reference>
+                            <el-icon class="icon" style="margin-left: 15px">
+                                <Delete />
+                            </el-icon>
+                        </template>
+                    </el-popconfirm>
+                    <el-icon v-show="!isEditingBookmark" class="icon" style="margin-left: 15px; float:left">
+                        <Edit @click="isEditingBookmark = true" />
+                    </el-icon>
+                    <el-icon v-show="!isEditingBookmark" class="icon" style="margin-left: 15px; float:left">
+                        <CopyDocument @click="copyBookmark" />
+                    </el-icon>
+                    <el-icon v-show="isEditingBookmark" class="icon" style="margin-left: 15px; float:left">
+                        <Close @click="isEditingBookmark = false" />
+                    </el-icon>
+                    <el-icon v-show="isEditingBookmark" class="icon" style="margin-left: 15px; float:left">
+                        <Check @click="handleEditBookmark(index, bookmarkForEditing)" />
+                    </el-icon>
+                </div>
             </div>
-            <h3 v-if="!isEditingBookmark" v-html="highlightedTitle"></h3>
+            <h5 v-if="!isEditingBookmark" v-html="highlightedTitle"></h5>
             <el-input v-else v-model="bookmarkForEditing.title" clearable style="margin-bottom: 10px;max-width: 600px">
                 <template #prepend>Title</template>
             </el-input>
@@ -59,6 +63,7 @@ export default {
         }
     },
     props: {
+        isPluginEnvironment: { type: Boolean, required: true },
         bookmark: { type: Object, required: true },
         index: { type: Number, required: true },
         seekTo: { type: Function, required: true },

@@ -1,6 +1,7 @@
 <template>
     <section id="bookmarks" class="bookmarks">
-        <h2 @mouseover="isMouseoverBookmarks = true" @mouseout="isMouseoverBookmarks = false">Bookmarks
+        <h2 v-show="!isPluginEnvironment" @mouseover="isMouseoverBookmarks = true"
+            @mouseout="isMouseoverBookmarks = false">Bookmarks
             <el-icon v-show="isMouseoverBookmarks && isHideBookmarks" class="icon" style="margin-left: 8px">
                 <View @click="isHideBookmarks = false" />
             </el-icon>
@@ -36,13 +37,27 @@
                 <WebpPreview v-for="bookmark in bookmarkInfo.bookmarks" @click="seekTo(bookmark.timestamp)"
                     :key="bookmark.format" :webpPath="webpPath" :clip="bookmark.clip" :isPlay="isPlayBookmarks" />
             </div>
-            <div v-show="!isWebpsOnly" class="scroll-container" id="bookmarks-scroll-container">
-                <Bookmark v-for="(bookmark, index) in bookmarkInfo.bookmarks" :key="bookmark.format"
-                    @mouseover="isBookmarksMouseOver = true" @mouseout="isBookmarksMouseOver = false"
-                    :id="`bookmark-${bookmark.timestamp.toString()}`" :seekTo="seekTo" :webpPath="webpPath"
-                    :bookmark="bookmark" :index="index" :removeBookmark="removeBookmark"
-                    :bookmarkPattern="bookmarkPattern" :highlightTextWithMatch="highlightTextWithMatch"
-                    :editBookmark="editBookmark" :isPlayBookmarks="isPlayBookmarks" />
+            <div v-if="!isPluginEnvironment">
+                <div v-show="!isWebpsOnly" class="scroll-container" id="bookmarks-scroll-container">
+                    <Bookmark v-for="(bookmark, index) in bookmarkInfo.bookmarks" :key="bookmark.format"
+                        @mouseover="isBookmarksMouseOver = true" @mouseout="isBookmarksMouseOver = false"
+                        :id="`bookmark-${bookmark.timestamp.toString()}`" :isPluginEnvironment="isPluginEnvironment"
+                        :seekTo="seekTo" :webpPath="webpPath" :bookmark="bookmark" :index="index"
+                        :removeBookmark="removeBookmark" :bookmarkPattern="bookmarkPattern"
+                        :highlightTextWithMatch="highlightTextWithMatch" :editBookmark="editBookmark"
+                        :isPlayBookmarks="isPlayBookmarks" />
+                </div>
+            </div>
+            <div v-else>
+                <div v-show="!isWebpsOnly">
+                    <Bookmark v-for="(bookmark, index) in bookmarkInfo.bookmarks" :key="bookmark.format"
+                        @mouseover="isBookmarksMouseOver = true" @mouseout="isBookmarksMouseOver = false"
+                        :id="`bookmark-${bookmark.timestamp.toString()}`" :isPluginEnvironment="isPluginEnvironment"
+                        :seekTo="seekTo" :webpPath="webpPath" :bookmark="bookmark" :index="index"
+                        :removeBookmark="removeBookmark" :bookmarkPattern="bookmarkPattern"
+                        :highlightTextWithMatch="highlightTextWithMatch" :editBookmark="editBookmark"
+                        :isPlayBookmarks="isPlayBookmarks" />
+                </div>
             </div>
         </div>
     </section>
@@ -76,6 +91,7 @@ export default {
         }
     },
     props: {
+        isPluginEnvironment: { type: Boolean, required: true },
         setIsBookmarksMouseOver: { type: Function, required: true },
         clearBookmarks: { type: Function, required: true },
         bookmarkInfo: { type: Object, required: true },

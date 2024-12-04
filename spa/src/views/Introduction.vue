@@ -17,17 +17,25 @@
                     <Refresh @click="renameVarchiveLinkDir" />
                 </el-icon>
             </h1>
-            <el-input v-if="isInfoEditing" v-model="infoEditing.title" clearable
-                style="margin-bottom: 10px;max-width: 40%">
+            <el-input v-if="isInfoEditing" v-model="infoEditing.title" clearable style="margin-bottom: 10px">
                 <template #prepend>Title</template>
             </el-input>
         </div>
-        <div class="header">
+        <div v-if="!isPluginEnvironment" class="header">
             <img class="cover" @click="openInIINA(urlSelected)" @mouseover="isCoverMouseOver = true"
                 @mouseout="isCoverMouseOver = false" :src="coverSrc" alt="cover">
             <p class="editing" v-if="!isInfoEditing" v-html="videoInfo.description"></p>
             <el-input v-else v-model="infoEditing.description" autosize type="textarea"
                 placeholder="Please input description" />
+        </div>
+        <div v-if="isPluginEnvironment" class="header">
+            <img class="cover" @click="openInIINA(urlSelected)" @mouseover="isCoverMouseOver = true"
+                @mouseout="isCoverMouseOver = false" :src="coverSrc" alt="cover">
+        </div>
+        <div v-if="isPluginEnvironment">
+            <p class="editing" v-if="!isInfoEditing" v-html="videoInfo.description"></p>
+            <el-input v-else v-model="infoEditing.description" autosize type="textarea"
+                placeholder="Please input description" style="margin-top: 15px;"/>
         </div>
 
         <VideoURL :paths="videoInfo.path" :openInIINA="openInIINA" :setSeletedURL="setSeletedURL"
@@ -55,6 +63,7 @@ export default {
         }
     },
     props: {
+        isPluginEnvironment: { type: Boolean, required: true },
         changeInfo: { type: Function, required: true },
         renameOption: { type: Boolean, required: true },
         openInIINA: { type: Function, required: true },

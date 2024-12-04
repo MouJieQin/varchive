@@ -460,10 +460,10 @@ body {
     transition: 0.2s ease transform;
 }
 
-.bookmarks .bookmark:hover {
+/* .bookmarks .bookmark:hover {
     transform: scale(1.05);
     background-color: rgba(39, 43, 53, 1);
-}
+} */
 
 .bookmarks .bookmark-playing {
     transform: scale(1.05);
